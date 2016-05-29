@@ -1,0 +1,3 @@
+#!/bin/sh
+killall shairport-sync-metadata-reader
+/usr/local/bin/node /volumio/app/plugins/music_service/airplay_emulation/stopairplaynotify.js

@@ -11,7 +11,9 @@ alsa =
 
 sessioncontrol =
 {
-  run_this_before_play_begins = "/usr/bin/mpc stop";
+  run_this_before_play_begins = "/volumio/app/plugins/music_service/airplay_emulation/startairplay";
+  run_this_after_play_ends = "/volumio/app/plugins/music_service/airplay_emulation/stopairplay";
+  allow_session_interruption = "yes";
 };
 metadata =
 {

@@ -216,7 +216,7 @@ CoreStateMachine.prototype.startPlaybackTimer = function (nStartTime) {
 // Stop playback timer
 CoreStateMachine.prototype.stopPlaybackTimer = function () {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::stPlaybackTimer');
-    
+
     this.runPlaybackTimer=false;
     return libQ.resolve();
 };
@@ -226,7 +226,7 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 
     var now=Date.now();
     this.currentSeek+=(now-this.playbackStart);
-    
+
     if(this.runPlaybackTimer==true)
     {
         this.playbackStart=Date.now();
@@ -324,10 +324,14 @@ CoreStateMachine.prototype.syncState = function (stateService, sService) {
 	//this.currentTrackBlock.service = sService;
 
     var trackBlock = this.getTrack(this.currentPosition);
+	console.log(stateService);
+
     if(trackBlock!=undefined && trackBlock.service!==sService)
     {
-        this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'Received update from a service different from the one supposed to be playing music. Skipping notification.');
-        return;
+		trackBlock.service===sService
+		trackBlock.service===stateService
+        //this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'Received update from a service different from the one supposed to be playing music. Skipping notification.');
+        //return;
     }
 
     this.timeLastServiceStateUpdate = Date.now();
@@ -605,15 +609,15 @@ CoreStateMachine.prototype.seek = function (position) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::seek');
 
     var trackBlock = this.getTrack(this.currentPosition);
-    if (trackBlock !== undefined) 
+    if (trackBlock !== undefined)
     {
         this.commandRouter.pushConsoleMessage('TRACKBLOCK ' + JSON.stringify(trackBlock));
-    
+
         var thisPlugin = this.commandRouter.pluginManager.getPlugin('music_service', trackBlock.service);
-    
+
         this.currentSeek = position*1000;
         this.startPlaybackTimer(position*1000);
-    
+
         thisPlugin.seek(position*1000);
 
         this.pushState().fail(this.pushError.bind(this));
@@ -800,13 +804,13 @@ CoreStateMachine.prototype.previous = function (promisedResponse) {
 
 CoreStateMachine.prototype.removeQueueItem = function (nIndex) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::removeQueueItem');
-    
+
     if(this.currentPosition==nIndex)
     {
         this.next();
         this.currentPosition--;
     }
-        
+
     return this.playQueue.removeQueueItem(nIndex);
 };
 

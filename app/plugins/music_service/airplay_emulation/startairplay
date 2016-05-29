@@ -1,0 +1,4 @@
+#!/bin/sh
+/usr/bin/mpc stop
+/usr/local/bin/node /volumio/app/plugins/music_service/airplay_emulation/startairplaynotify.js
+shairport-sync-metadata-reader < /tmp/shairport-sync-metadata > /tmp/airplaymetadata
