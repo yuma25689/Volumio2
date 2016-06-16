@@ -8,6 +8,9 @@ function CoreStateMachine(commandRouter) {
 	this.commandRouter = commandRouter;
 	this.playQueue = new (require('./playqueue.js'))(commandRouter, this);
 	this.resetVolumioState();
+
+	this.currentVolume = '';
+	this.currentMute = '';
 }
 
 // Public Methods ---------------------------------------------------------------------------------------
@@ -250,8 +253,6 @@ CoreStateMachine.prototype.resetVolumioState = function () {
 			self.currentChannels = null;
 			self.currentRandom = null;
 			self.currentRepeat = null;
-			self.currentVolume = null;
-			self.currentMute = null;
 			return self.getcurrentVolume();
 		});
 };
@@ -366,7 +367,6 @@ CoreStateMachine.prototype.syncState = function (stateService, sService) {
 			this.currentChannels = stateService.channels;
 			this.currentRandom = stateService.random;
 			this.currentRepeat = stateService.repeat;
-
 			this.pushState().fail(this.pushError.bind(this));
 
 			return this.startPlaybackTimer(this.currentSeek);
