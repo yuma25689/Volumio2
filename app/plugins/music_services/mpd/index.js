@@ -515,6 +515,11 @@ ControllerMpd.prototype.parseState = function (objState) {
 		sStatus = objState.state;
 	}
 
+	var volume = null;
+	if ('volume' in objState) {
+		volume = objState.volume;
+	}
+
 
 	return {
 		status: sStatus,
@@ -525,6 +530,7 @@ ControllerMpd.prototype.parseState = function (objState) {
 		bitdepth: nBitDepth,
 		channels: nChannels,
 		random: random,
+		volume: volume,
 		repeat: repeat
 	};
 };
@@ -1290,15 +1296,20 @@ ControllerMpd.prototype.rescanDb = function () {
 
 ControllerMpd.prototype.getGroupVolume = function () {
 	var self = this;
+	var defer = libQ.defer();
+
 	return self.sendMpdCommand('status', [])
 		.then(function (objState) {
-			var state = self.parseState(objState);
-			if (state.volume != undefined) {
-				state.volume = groupvolume;
-				console.log(groupvolume);
-				return libQ.resolve(groupvolume);
+
+			if (objState.volume) {
+				console.log(objState.volume);
+				defer.resolve(objState.volume);
 			}
+
+
+
 		});
+	return defer.promise;
 };
 
 ControllerMpd.prototype.setGroupVolume = function (data) {
@@ -1344,3 +1355,4 @@ ControllerMpd.prototype.getMixerControls = function () {
 	//console.log(cards)
 
 };
+
