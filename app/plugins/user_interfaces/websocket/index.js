@@ -785,7 +785,7 @@ function InterfaceWebUI(context) {
 			connWebSocket.on('getMultiroom', function (data) {
 				var selfConnWebSocket = this;
 
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'getMultiroom', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'getMultiroom', data);
 
 				if (returnedData != undefined) {
 					returnedData.then(function (data) {
@@ -803,7 +803,7 @@ function InterfaceWebUI(context) {
 			connWebSocket.on('setMultiroom', function (data) {
 				var selfConnWebSocket = this;
 
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'setMultiroom', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'setMultiroom', data);
 				returnedData.then(function (data) {
 					selfConnWebSocket.emit('pushMultiroom', data);
 				});
@@ -814,7 +814,7 @@ function InterfaceWebUI(context) {
 			connWebSocket.on('writeMultiroom', function (data) {
 				var selfConnWebSocket = this;
 
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'writeMultiRoom', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'writeMultiRoom', data);
 
 			});
 
@@ -825,18 +825,18 @@ function InterfaceWebUI(context) {
 
 			connWebSocket.on('setAsMultiroomSingle', function (data) {
 				//console.log("Setting as multiroomSingle");
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'setSingle', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'setSingle', data);
 
 			});
 			connWebSocket.on('setAsMultiroomServer', function (data) {
 				//console.log("Setting as multiroomServer");
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'setServer', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'setServer', data);
 				//selfConnWebSocket.emit('pushWriteMultiroom',data);
 
 			});
 			connWebSocket.on('setAsMultiroomClient', function (data) {
 				//console.log("Setting as multiroomClient");
-				var returnedData = self.commandRouter.executeOnPlugin('audio_interface', 'multiroom', 'setClient', data);
+				var returnedData = self.commandRouter.executeOnPlugin('audio_interfaces', 'multiroom', 'setClient', data);
 				//selfConnWebSocket.emit('pushWriteMultiroom',data);
 
 			});
