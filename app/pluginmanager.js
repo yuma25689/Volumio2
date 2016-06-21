@@ -16,7 +16,7 @@ function PluginManager(ccommand, server) {
 
 	self.config = new (require('v-conf'))();
 
-	var pluginsDataFile = '/data/configuration/plugins.json';
+	var pluginsDataFile = '__dirname + '/plugins/plugins.json'';
 	if (!fs.existsSync(pluginsDataFile)) {
 		fs.copySync(__dirname + '/plugins/plugins.json', pluginsDataFile);
 	}
