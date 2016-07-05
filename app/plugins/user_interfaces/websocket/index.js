@@ -1026,40 +1026,6 @@ function InterfaceWebUI(context) {
 			/**
 			 * New share APIs
 			 */
-			connWebSocket.on('addShare', function (data) {
-				var selfConnWebSocket = this;
-
-				var returnedData = self.commandRouter.executeOnPlugin('system_controller', 'networkfs', 'addShare', data);
-
-				if (returnedData != undefined) {
-					returnedData.then(function (data) {
-						selfConnWebSocket.emit('pushAddShare', data);
-						setTimeout(function () {
-						var returnedData = self.commandRouter.executeOnPlugin('system_controller', 'networkfs', 'listShares', data);
-						if (returnedData != undefined) {
-							returnedData.then(function (data) {
-								selfConnWebSocket.emit('pushListShares', data);
-							});
-						}
-						}, 1000)
-					});
-				}
-				else self.logger.error("Error on adding share");
-			});
-
-			connWebSocket.on('deleteShare', function (data) {
-				var selfConnWebSocket = this;
-
-				var returnedData = self.commandRouter.executeOnPlugin('system_controller', 'networkfs', 'deleteShare', data);
-
-				if (returnedData != undefined) {
-					returnedData.then(function (data) {
-						selfConnWebSocket.emit('pushDeleteShare', data);
-					});
-				}
-				else self.logger.error("Error on deleting share");
-			});
-
 			connWebSocket.on('getListShares', function (data) {
 				var selfConnWebSocket = this;
 
@@ -1092,13 +1058,20 @@ function InterfaceWebUI(context) {
 				var returnedData = self.commandRouter.executeOnPlugin('system_controller', 'networkfs', 'editShare', data);
 
 				if (returnedData != undefined) {
-					returnedData.then(function (data) {
-						selfConnWebSocket.emit('pushEditShare', data);
+					returnedData.then(function (datas) {
+						console.log('RETURN NAS : ' + JSON.stringify(datas));
+						selfConnWebSocket.emit(datas.emit, datas.data);
+						setTimeout(function () {
+							var listdata = self.commandRouter.executeOnPlugin('system_controller', 'networkfs', 'listShares', '');
+							if (listdata != undefined) {
+								listdata.then(function (datalist) {
+									selfConnWebSocket.emit('pushListShares', datalist);
+								});
+							}
+						}, 1000)
 					});
-				}
-				else self.logger.error("Error on storing on share");
+				} else self.logger.error("Error on storing on share");
 			});
-
 
 			connWebSocket.on('listUsbDrives', function (data) {
 				var selfConnWebSocket = this;
