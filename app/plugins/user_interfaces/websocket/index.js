@@ -1125,6 +1125,14 @@ function InterfaceWebUI(context) {
 					}
 
 			});
+			
+		        connWebSocket.on('getUiSettings', function () {
+				var selfConnWebSocket = this;
+				var settings = {"background":{"title":"default", "path":"default"},"language":"en", "theme":""}
+				selfConnWebSocket.emit('pushUiSettings', settings);
+
+
+			});
 
 
 
