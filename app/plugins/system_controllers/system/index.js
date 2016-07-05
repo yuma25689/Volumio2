@@ -265,30 +265,41 @@ ControllerSystem.prototype.registerCallback = function (callback) {
 };
 
 ControllerSystem.prototype.getSystemVersion = function () {
-    var self = this;
-    var defer = libQ.defer();
-    var file = fs.readFileSync('/etc/os-release').toString().split('\n');
-    var releaseinfo = {
-        'systemversion': null,
-        'builddate': null
-    };
-    console.log(file);
-    var nLines = file.length;
-    var str;
-    for (var l = 0; l < nLines; l++) {
-        if (file[l].match(/VOLUMIO_VERSION/i)) {
-            str = file[l].split('=');
-            releaseinfo.systemversion = str[1].replace(/\"/gi, "");
-        }
-        if (file[l].match(/VOLUMIO_BUILD_DATE/i)) {
-            str = file[l].split('=');
-            releaseinfo.builddate = str[1].replace(/\"/gi, "");
-        }
-    }
-    defer.resolve(releaseinfo);
+	var self = this;
+	var defer = libQ.defer();
+	var file = fs.readFileSync('/etc/os-release').toString().split('\n');
+	var releaseinfo = {
+		'systemversion': null,
+		'builddate': null,
+		'variant': null,
+		'hardware':null
+	};
+	//console.log(file);
+	var nLines = file.length;
+	var str;
+	for (var l = 0; l < nLines; l++) {
+		if (file[l].match(/VOLUMIO_VERSION/i)) {
+			str = file[l].split('=');
+			releaseinfo.systemversion = str[1].replace(/\"/gi, "");
+		}
+		if (file[l].match(/VOLUMIO_BUILD_DATE/i)) {
+			str = file[l].split('=');
+			releaseinfo.builddate = str[1].replace(/\"/gi, "");
+		}
+		if (file[l].match(/VOLUMIO_VARIANT/i)) {
+			str = file[l].split('=');
+			releaseinfo.variant = str[1].replace(/\"/gi, "");
+		}
+		if (file[l].match(/VOLUMIO_HARDWARE/i)) {
+			str = file[l].split('=');
+			releaseinfo.hardware = str[1].replace(/\"/gi, "");
+		}
+
+	}
+	defer.resolve(releaseinfo);
 
 
-    return defer.promise;
+	return defer.promise;
 };
 
 ControllerSystem.prototype.setTestSystem = function (data) {
