@@ -1128,7 +1128,7 @@ function InterfaceWebUI(context) {
 			
 		        connWebSocket.on('getUiSettings', function () {
 				var selfConnWebSocket = this;
-				var settings = {"background":{"title":"default", "path":"default"},"language":"en", "theme":""}
+				var settings = {"language":"en"}
 				selfConnWebSocket.emit('pushUiSettings', settings);
 
 
