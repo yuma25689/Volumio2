@@ -31,11 +31,11 @@ ControllerSystem.prototype.onVolumioStart = function () {
     this.config.loadFile(configFile);
 
     var uuid = this.config.get('uuid');
-    if (uuid == undefined) {
-        console.log("No id defined. Creating one");
-        var uuid = require('node-uuid');
-        self.config.addConfigValue('uuid', 'string', uuid.v4());
-    }
+	if (uuid == undefined) {
+		console.log("No id defined. Creating one");
+		var uuid = require('node-uuid');
+		self.config.addConfigValue('uuid', 'string', uuid.v4());
+	}
 
 
 
@@ -43,7 +43,7 @@ ControllerSystem.prototype.onVolumioStart = function () {
     this.commandRouter.sharedVars.addConfigValue('system.name', 'string', self.config.get('playerName'));
 
     self.deviceDetect();
-    self.checkTestSystem();
+	self.callHome();
 };
 
 ControllerSystem.prototype.onStop = function () {
@@ -434,3 +434,37 @@ ControllerSystem.prototype.enableSSH = function (data) {
         }
     });
 }
+
+
+ControllerSystem.prototype.callHome = function () {
+	var self = this;
+
+
+	try {
+		var macaddr = fs.readFileSync('/sys/class/net/eth0/address', "utf8");
+		var anonid = macaddr.toString().replace(':','');
+
+	} catch (e) {
+		console.log(e)
+		var anonid = self.config.get('uuid');
+	}
+	var md5 = crypto.createHash('md5').update(anonid).digest("hex");
+	var info = self.getSystemVersion();
+	info.then(function(infos)
+	{
+		if ((infos.variant) && (infos.systemversion) && (infos.hardware) && (md5)) {
+		console.log('Volumio Calling Home');
+		exec('/usr/bin/curl -X POST --data-binary "device='+ infos.hardware + '&variante=' + infos.variant + '&version=' + infos.systemversion + '&uuid=' + md5 +'" http://updates.volumio.org:7070/downloader-v1/track-device',
+			function (error, stdout, stderr) {
+
+				if (error !== null) {
+					self.logger.info('Cannot call home: '+error);
+				}
+				else self.logger.info('Volumio called home');
+
+			});
+	} else {
+			self.logger.info('Cannot retrieve data for calling home');
+	}
+	});
+};
