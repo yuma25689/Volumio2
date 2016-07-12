@@ -482,6 +482,9 @@ ControllerNetworkfs.prototype.getMountSize = function (share) {
 			id: share,
 			name: name,
 			fstype: config.get(key + 'fstype'),
+			username: config.get(key + 'user'),
+			password: config.get(key + 'password'),
+			options: config.get(key + 'options'),
 			mounted: mounted.mounted,
 			size: realsize
 		};
