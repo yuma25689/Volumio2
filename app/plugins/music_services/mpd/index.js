@@ -1328,17 +1328,74 @@ ControllerMpd.prototype.handleBrowseUri = function (curUri) {
 
     var response;
 
+    console.log("CURURI: "+curUri);
     if (curUri.startsWith('music-library')) {
         response = self.lsInfo(curUri);
     }else if (curUri.startsWith('playlists')) {
         if (curUri == 'playlists')
             response = self.listPlaylists(curUri);
         else response = self.browsePlaylist(curUri);
+    }else if (curUri.startsWith('albums')) {
+        if (curUri == 'albums')
+            response = self.listAlbums(curUri);
+        else response = self.browsePlaylist(curUri);
+    }else if (curUri.startsWith('artists')) {
+        if (curUri == 'artists')
+            response = self.listPlaylists(curUri);
+        else response = self.browsePlaylist(curUri);
+    }else if (curUri.startsWith('genres')) {
+        if (curUri == 'genres')
+            response = self.listPlaylists(curUri);
+        else response = self.browsePlaylist(curUri);
     }
+
 
     return response;
 };
 
+
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.listAlbums = function () {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var response = {
+        navigation: {
+            prev: {
+                uri: ''
+            },
+            list: []
+        }
+    };
+
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("list", ["album"]), function (err, msg) {
+        if(err)
+            defer.reject(new Error('Cannot list albums'));
+        else
+        {
+            var splitted=msg.split('\n');
+
+            for(var i in splitted)
+            {
+                if(splitted[i].startsWith('Album:'))
+                {
+                    var albumName=splitted[i].substring(7);
+                    var album = {type: 'folder', title: albumName, icon: 'fa fa-list-ol', uri: 'albums/' + albumName};
+
+                    response.navigation.list.push(album);
+                }
+            }
+            defer.resolve(response);
+        }
+    });
+    return defer.promise;
+
+};
 
 ControllerMpd.prototype.getMixerControls = function () {
 	var self = this;
