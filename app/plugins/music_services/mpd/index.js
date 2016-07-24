@@ -143,12 +143,12 @@ ControllerMpd.prototype.updateMpdDB = function () {
 
 
 ControllerMpd.prototype.addPlay = function (fileName) {
+    var self=this;
 
 	this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'ControllerMpd::addPlay');
 	this.commandRouter.pushToastMessage('Success', '', fileName + ' Added');
 
-
-
+    this.logger.info("FILENAME "+fileName);
 	//Add playlists and cue with load command
 	if (fileName.endsWith('.cue') || fileName.endsWith('.pls') || fileName.endsWith('.m3u')) {
 		this.logger.info('Adding Playlist: ' + fileName);
@@ -158,7 +158,6 @@ ControllerMpd.prototype.addPlay = function (fileName) {
 			{command: 'play', parameters: []}
 		])
 	} else if (fileName.startsWith('albums')) {
-	    self.logger.info("PLAYYYYYYYY");
 	    return self.playAlbum(fileName);
     } else {
 		return this.sendMpdCommandArray([
@@ -1438,6 +1437,7 @@ ControllerMpd.prototype.listAlbumSongs = function (curUri) {
                     var artist = self.searchFor(lines, i + 1, 'Artist:');
                     var album = self.searchFor(lines, i + 1, 'Album:');
                     var title = self.searchFor(lines, i + 1, 'Title:');
+                    var albumart=self.getAlbumArt({artist: artist, album: album}, path);
 
                     if (title) {
                         title = title;
@@ -1450,7 +1450,7 @@ ControllerMpd.prototype.listAlbumSongs = function (curUri) {
                         title: title,
                         artist: artist,
                         album: album,
-                        icon: 'fa fa-music',
+                        icon: albumart,
                         uri: 'albums/'+path
                     });
                 }

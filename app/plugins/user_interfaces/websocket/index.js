@@ -120,7 +120,9 @@ function InterfaceWebUI(context) {
 			});
 
 			connWebSocket.on('addPlay', function (data) {
-				if (data.service == undefined || data.service == 'mpd') {
+				if ((data.service == undefined || data.service == 'mpd') &&
+                    (data.uri.startsWith('albums')==false && data.uri.startsWith('artists')==false &&
+                    data.uri.startsWith('genres')==false)){
 					var uri = data.uri;
 					var arr = uri.split("/");
 					arr.shift();
