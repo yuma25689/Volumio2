@@ -159,7 +159,10 @@ ControllerMpd.prototype.addPlay = function (fileName) {
 		])
 	} else if (fileName.startsWith('albums')) {
 	    return self.playAlbum(fileName);
-    } else {
+    }
+    else if (fileName.startsWith('artists')) {
+        return self.playArtist(fileName);
+    }else {
 		return this.sendMpdCommandArray([
 			{command: 'clear', parameters: []},
 			{command: 'add', parameters: [fileName]},
@@ -1344,8 +1347,8 @@ ControllerMpd.prototype.handleBrowseUri = function (curUri) {
         else response = self.listAlbumSongs(curUri);
     }else if (curUri.startsWith('artists')) {
         if (curUri == 'artists')
-            response = self.listPlaylists(curUri);
-        else response = self.browsePlaylist(curUri);
+            response = self.listArtists(curUri);
+        else response = self.listArtistSongs(curUri);
     }else if (curUri.startsWith('genres')) {
         if (curUri == 'genres')
             response = self.listPlaylists(curUri);
@@ -1437,7 +1440,7 @@ ControllerMpd.prototype.listAlbumSongs = function (curUri) {
                     var artist = self.searchFor(lines, i + 1, 'Artist:');
                     var album = self.searchFor(lines, i + 1, 'Album:');
                     var title = self.searchFor(lines, i + 1, 'Title:');
-                    var albumart=self.getAlbumArt({artist: artist, album: album}, path);
+                    var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
 
                     if (title) {
                         title = title;
@@ -1539,6 +1542,182 @@ ControllerMpd.prototype.playAlbum = function (curUri) {
 
 
 
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.listArtists = function () {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var response = {
+        navigation: {
+            prev: {
+                uri: ''
+            },
+            list: []
+        }
+    };
+
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("list", ["artist"]), function (err, msg) {
+        if(err)
+            defer.reject(new Error('Cannot list artist'));
+        else
+        {
+            var splitted=msg.split('\n');
+
+            for(var i in splitted)
+            {
+                if(splitted[i].startsWith('Artist:'))
+                {
+                    var albumName=splitted[i].substring(8);
+                    var album = {type: 'folder', title: albumName, icon: 'fa fa-list-ol', uri: 'artists/' + albumName};
+
+                    response.navigation.list.push(album);
+                }
+            }
+            defer.resolve(response);
+        }
+    });
+    return defer.promise;
+
+};
+
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.listArtistSongs = function (curUri) {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var splitted=curUri.split('/');
+    var albumName=""
+
+    if(curUri.startsWith('/'))
+    {
+        albumName=splitted[2];
+    }
+    else
+    {
+        albumName=splitted[1];
+    }
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("find artist \""+albumName+"\"", []), function (err, msg) {
+
+        var list = [];
+        if (msg) {
+            var path;
+            var name;
+            var lines = msg.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                if (line.indexOf('file:') === 0) {
+                    var path = line.slice(6);
+                    var name = path.split('/').pop();
+
+                    var artist = self.searchFor(lines, i + 1, 'Artist:');
+                    var album = self.searchFor(lines, i + 1, 'Album:');
+                    var title = self.searchFor(lines, i + 1, 'Title:');
+                    var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+
+                    if (title) {
+                        title = title;
+                    } else {
+                        title = name;
+                    }
+                    list.push({
+                        service: 'mpd',
+                        type: 'song',
+                        title: title,
+                        artist: artist,
+                        album: album,
+                        icon: albumart,
+                        uri: 'artists/'+path
+                    });
+                }
+
+            }
+        }
+        else self.logger.info(err);
+
+        defer.resolve({
+            navigation: {
+                prev: {
+                    uri: 'artists'
+                },
+                list: list
+            }
+        });
+    });
+    return defer.promise;
+
+};
+
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.playArtist = function (curUri) {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var splitted=curUri.split('/');
+    var albumName="";
+
+
+    if(curUri.startsWith('/'))
+    {
+        albumName=splitted[2];
+    }
+    else
+    {
+        albumName=splitted[1];
+    }
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("find artist \""+albumName+"\"", []), function (err, msg) {
+
+        self.logger.info("MSG "+msg);
+        var list = [];
+        if (msg) {
+            var path;
+            var name;
+            var lines = msg.split('\n');
+
+            var songArray=[];
+
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+
+                if (line.indexOf('file:') === 0) {
+                    var path = line.slice(6);
+                    var name = path.split('/').pop();
+
+                    songArray.push(path);
+                }
+            }
+            var playDefer=self.clearAddPlayTracks(songArray);
+
+            playDefer.then(function(){
+                defer.resolve();
+            })
+                .fail(function(){
+                    defer.reject(new Error());
+                })
+        }
+        else
+        {
+            sef.logger.error("ERROR: "+err);
+            defer.reject(new Error());
+        }
+    });
+    return defer.promise;
+
+};
 
 
 ControllerMpd.prototype.getMixerControls = function () {
