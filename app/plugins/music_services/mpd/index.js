@@ -148,6 +148,7 @@ ControllerMpd.prototype.addPlay = function (fileName) {
 	this.commandRouter.pushToastMessage('Success', '', fileName + ' Added');
 
 
+
 	//Add playlists and cue with load command
 	if (fileName.endsWith('.cue') || fileName.endsWith('.pls') || fileName.endsWith('.m3u')) {
 		this.logger.info('Adding Playlist: ' + fileName);
@@ -156,7 +157,10 @@ ControllerMpd.prototype.addPlay = function (fileName) {
 			{command: 'load', parameters: [fileName]},
 			{command: 'play', parameters: []}
 		])
-	} else {
+	} else if (fileName.startsWith('albums')) {
+	    self.logger.info("PLAYYYYYYYY");
+	    return self.playAlbum(fileName);
+    } else {
 		return this.sendMpdCommandArray([
 			{command: 'clear', parameters: []},
 			{command: 'add', parameters: [fileName]},
@@ -1338,7 +1342,7 @@ ControllerMpd.prototype.handleBrowseUri = function (curUri) {
     }else if (curUri.startsWith('albums')) {
         if (curUri == 'albums')
             response = self.listAlbums(curUri);
-        else response = self.browsePlaylist(curUri);
+        else response = self.listAlbumSongs(curUri);
     }else if (curUri.startsWith('artists')) {
         if (curUri == 'artists')
             response = self.listPlaylists(curUri);
@@ -1396,6 +1400,146 @@ ControllerMpd.prototype.listAlbums = function () {
     return defer.promise;
 
 };
+
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.listAlbumSongs = function (curUri) {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var splitted=curUri.split('/');
+    var albumName=""
+
+    if(curUri.startsWith('/'))
+    {
+        albumName=splitted[2];
+    }
+    else
+     {
+        albumName=splitted[1];
+    }
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("find album \""+albumName+"\"", []), function (err, msg) {
+
+        var list = [];
+        if (msg) {
+            var path;
+            var name;
+            var lines = msg.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+               var line = lines[i];
+               if (line.indexOf('file:') === 0) {
+                    var path = line.slice(6);
+                    var name = path.split('/').pop();
+
+                    var artist = self.searchFor(lines, i + 1, 'Artist:');
+                    var album = self.searchFor(lines, i + 1, 'Album:');
+                    var title = self.searchFor(lines, i + 1, 'Title:');
+
+                    if (title) {
+                        title = title;
+                    } else {
+                        title = name;
+                    }
+                    list.push({
+                        service: 'mpd',
+                        type: 'song',
+                        title: title,
+                        artist: artist,
+                        album: album,
+                        icon: 'fa fa-music',
+                        uri: 'albums/'+path
+                    });
+                }
+
+            }
+        }
+        else self.logger.info(err);
+
+        defer.resolve({
+            navigation: {
+                prev: {
+                    uri: 'albums'
+                },
+                list: list
+            }
+        });
+    });
+    return defer.promise;
+
+};
+
+/**
+ *
+ * list album
+ */
+ControllerMpd.prototype.playAlbum = function (curUri) {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    var splitted=curUri.split('/');
+    var albumName="";
+
+    self.logger.info("PLAYALBUM");
+
+    if(curUri.startsWith('/'))
+    {
+        albumName=splitted[2];
+    }
+    else
+    {
+        albumName=splitted[1];
+    }
+    var cmd = libMpd.cmd;
+    self.clientMpd.sendCommand(cmd("find album \""+albumName+"\"", []), function (err, msg) {
+
+        self.logger.info("MSG "+msg);
+        var list = [];
+        if (msg) {
+            var path;
+            var name;
+            var lines = msg.split('\n');
+
+            var songArray=[];
+
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+
+                if (line.indexOf('file:') === 0) {
+                    var path = line.slice(6);
+                    var name = path.split('/').pop();
+
+                    self.logger.info("PLAYING FILE: "+name);
+
+                    songArray.push(path);
+                }
+            }
+            var playDefer=self.clearAddPlayTracks(songArray);
+
+            playDefer.then(function(){
+                defer.resolve();
+            })
+            .fail(function(){
+                defer.reject(new Error());
+            })
+        }
+        else
+        {
+            sef.logger.error("ERROR: "+err);
+            defer.reject(new Error());
+        }
+    });
+    return defer.promise;
+
+};
+
+
+
+
 
 ControllerMpd.prototype.getMixerControls = function () {
 	var self = this;
