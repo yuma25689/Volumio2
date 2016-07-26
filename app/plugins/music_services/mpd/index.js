@@ -1352,7 +1352,7 @@ ControllerMpd.prototype.handleBrowseUri = function (curUri) {
     }else if (curUri.startsWith('artists')) {
         if (curUri == 'artists')
             response = self.listArtists(curUri);
-        else response = self.listArtistSongs(curUri);
+        else response = self.listArtist(curUri);
     }else if (curUri.startsWith('genres')) {
         if (curUri == 'genres')
             response = self.listGenres(curUri);
@@ -1603,70 +1603,72 @@ ControllerMpd.prototype.listArtists = function () {
  *
  * list album
  */
-ControllerMpd.prototype.listArtistSongs = function (curUri) {
+ControllerMpd.prototype.listArtist = function (curUri) {
     var self = this;
 
     var defer = libQ.defer();
 
     var splitted=curUri.split('/');
-    var albumName=""
 
-    if(curUri.startsWith('/'))
-    {
-        albumName=splitted[2];
-    }
-    else
-    {
-        albumName=splitted[1];
-    }
-    var cmd = libMpd.cmd;
-    self.clientMpd.sendCommand(cmd("find artist \""+albumName+"\"", []), function (err, msg) {
+    self.mpdReady
+        .then(function()
+        {
+            var artist=splitted[1];
+            var albums=[];
 
-        var list = [];
-        if (msg) {
-            var path;
-            var name;
-            var lines = msg.split('\n');
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                if (line.indexOf('file:') === 0) {
-                    var path = line.slice(6);
-                    var name = path.split('/').pop();
+            var cmd = libMpd.cmd;
 
-                    var artist = self.searchFor(lines, i + 1, 'Artist:');
-                    var album = self.searchFor(lines, i + 1, 'Album:');
-                    var title = self.searchFor(lines, i + 1, 'Title:');
-                    var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+            self.clientMpd.sendCommand(cmd("find artist \""+artist+"\"", []), function (err, msg) {
+                var list = [];
+                if (msg) {
+                    var path;
+                    var name;
+                    var lines = msg.split('\n');
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.indexOf('file:') === 0) {
+                            var path = line.slice(6);
+                            var name = path.split('/').pop();
 
-                    if (title) {
-                        title = title;
-                    } else {
-                        title = name;
+                            var artist = self.searchFor(lines, i + 1, 'Artist:');
+                            var album = self.searchFor(lines, i + 1, 'Album:');
+                            var title = self.searchFor(lines, i + 1, 'Title:');
+                            var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+
+                            if (title) {
+                                title = title;
+                            } else {
+                                title = name;
+                            }
+                            list.push({
+                                service: 'mpd',
+                                type: 'song',
+                                title: title,
+                                artist: artist,
+                                album: album,
+                                icon: albumart,
+                                uri: 'artists/'+path
+                            });
+
+                            if(albums.indexOf(album)==-1)
+                                albums.push(album);
+                        }
+
                     }
-                    list.push({
-                        service: 'mpd',
-                        type: 'song',
-                        title: title,
-                        artist: artist,
-                        album: album,
-                        icon: albumart,
-                        uri: 'artists/'+path
-                    });
                 }
+                else self.logger.info(err);
 
-            }
-        }
-        else self.logger.info(err);
-
-        defer.resolve({
-            navigation: {
-                prev: {
-                    uri: 'artists'
-                },
-                list: list
-            }
+                defer.resolve({
+                    navigation: {
+                        prev: {
+                            uri: 'artists'
+                        },
+                        list: albums.concat(list)
+                    }
+                });
+            });
         });
-    });
+
     return defer.promise;
 
 };
