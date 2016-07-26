@@ -234,8 +234,11 @@ var processRequest = function (web, path) {
 	}
 
 	if (path != undefined) {
-        path = '/mnt/' + path;
-		logger.info(path);
+
+	    if(path.startsWith('/mnt/')==false)
+            path = '/mnt/' + path;
+
+        logger.info(path);
 		if (fs.existsSync(path)) {
             var stats = fs.statSync(path);
             var isFolder=false;

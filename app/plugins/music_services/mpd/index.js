@@ -1444,7 +1444,7 @@ ControllerMpd.prototype.listAlbumSongs = function (curUri) {
                     var artist = self.searchFor(lines, i + 1, 'Artist:');
                     var album = self.searchFor(lines, i + 1, 'Album:');
                     var title = self.searchFor(lines, i + 1, 'Title:');
-                    var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+                    var albumart=self.getAlbumArt({artist: artist, album: album}, self.getParentFolder('/mnt/'+path));
 
                     if (title) {
                         title = title;
@@ -1620,7 +1620,7 @@ ControllerMpd.prototype.listArtist = function (curUri) {
 
             self.clientMpd.sendCommand(cmd("find artist \""+artist+"\"", []), function (err, msg) {
                 var list = [];
-                var albums=[];
+                var albums=[],albumarts=[];
                 if (msg) {
                     var path;
                     var name;
@@ -1634,7 +1634,7 @@ ControllerMpd.prototype.listArtist = function (curUri) {
                             var artist = self.searchFor(lines, i + 1, 'Artist:');
                             var album = self.searchFor(lines, i + 1, 'Album:');
                             var title = self.searchFor(lines, i + 1, 'Title:');
-                            var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+                            var albumart=self.getAlbumArt({artist: artist, album: album}, self.getParentFolder('/mnt/'+path));
 
                             if (title) {
                                 title = title;
@@ -1652,7 +1652,10 @@ ControllerMpd.prototype.listArtist = function (curUri) {
                             });
 
                             if(albums.indexOf(album)===-1)
+                            {
                                 albums.push(album);
+                                albumarts.push(self.getAlbumArt({artist: artist, album: album}, self.getParentFolder('/mnt/'+path)));
+                            }
                         }
 
                     }
@@ -1660,7 +1663,7 @@ ControllerMpd.prototype.listArtist = function (curUri) {
                     var result=[];
                     result.push({type:'title',title:'Albums'});
                     for(var i in albums)
-                        result.push({type: 'folder', title: albums[i], icon: 'fa fa-list-ol', uri: 'albums/' + albums[i]});
+                        result.push({type: 'folder', title: albums[i], icon: albumarts[i], uri: 'albums/' + albums[i]});
 
                     result.push({type:'title',title:'Songs'});
                     result=result.concat(list);
@@ -1829,7 +1832,9 @@ ControllerMpd.prototype.listGenre = function (curUri) {
             var cmd = libMpd.cmd;
             self.clientMpd.sendCommand(cmd("find genre \"" + albumName + "\"", []), function (err, msg) {
                 var albums=[];
+                var albumsArt=[];
                 var artists=[];
+                var artistArt=[];
 
                 var list = [];
                 if (msg) {
@@ -1845,7 +1850,7 @@ ControllerMpd.prototype.listGenre = function (curUri) {
                             var artist = self.searchFor(lines, i + 1, 'Artist:');
                             var album = self.searchFor(lines, i + 1, 'Album:');
                             var title = self.searchFor(lines, i + 1, 'Title:');
-                            var albumart = self.getAlbumArt({artist: artist, album: album}, '/mnt/' + path);
+                            var albumart = self.getAlbumArt({artist: artist, album: album}, self.getParentFolder('/mnt/' + path));
 
                             if (title) {
                                 title = title;
@@ -1864,10 +1869,16 @@ ControllerMpd.prototype.listGenre = function (curUri) {
 
 
                             if(albums.indexOf(album)===-1)
+                            {
                                 albums.push(album);
+                                albumsArt.push(albumart);
+                            }
 
                             if(artists.indexOf(artist)===-1)
+                            {
                                 artists.push(artist);
+                                artistArt.push(self.getAlbumArt({artist: artist}, self.getParentFolder('/mnt/' + path)))
+                            }
 
                         }
 
@@ -1878,11 +1889,11 @@ ControllerMpd.prototype.listGenre = function (curUri) {
 
                     result.push({type:'title',title:'Artists'});
                     for(var i in artists)
-                        result.push({type: 'folder', title: artists[i], icon: 'fa fa-list-ol', uri: 'artists/' + artists[i]});
+                        result.push({type: 'folder', title: artists[i], icon: artistArt[i], uri: 'artists/' + artists[i]});
 
                     result.push({type:'title',title:'Albums'});
                     for(var i in albums)
-                        result.push({type: 'folder', title: albums[i], icon: 'fa fa-list-ol', uri: 'albums/' + albums[i]});
+                        result.push({type: 'folder', title: albums[i], icon: albumsArt[i], uri: 'albums/' + albums[i]});
 
                     result.push({type:'title',title:'Songs'});
                     result=result.concat(list);
@@ -1997,5 +2008,15 @@ ControllerMpd.prototype.getMixerControls = function () {
 
 	//console.log(cards)
 
+};
+
+ControllerMpd.prototype.getParentFolder = function (file) {
+    var index=file.lastIndexOf('/');
+
+    if(index>-1)
+    {
+        return file.substring(0,index);
+    }
+    else return '';
 };
 
