@@ -1356,7 +1356,7 @@ ControllerMpd.prototype.handleBrowseUri = function (curUri) {
     }else if (curUri.startsWith('genres')) {
         if (curUri == 'genres')
             response = self.listGenres(curUri);
-        else response = self.listGenreSongs(curUri);
+        else response = self.listGenre(curUri);
     }
 
 
@@ -1786,6 +1786,7 @@ ControllerMpd.prototype.listGenres = function () {
         }
     };
 
+
     var cmd = libMpd.cmd;
     self.clientMpd.sendCommand(cmd("list", ["genre"]), function (err, msg) {
         if(err)
@@ -1815,70 +1816,96 @@ ControllerMpd.prototype.listGenres = function () {
  *
  * list album
  */
-ControllerMpd.prototype.listGenreSongs = function (curUri) {
+ControllerMpd.prototype.listGenre = function (curUri) {
     var self = this;
 
     var defer = libQ.defer();
 
     var splitted=curUri.split('/');
-    var albumName=""
+    var albumName=splitted[1];
 
-    if(curUri.startsWith('/'))
-    {
-        albumName=splitted[2];
-    }
-    else
-    {
-        albumName=splitted[1];
-    }
-    var cmd = libMpd.cmd;
-    self.clientMpd.sendCommand(cmd("find genre \""+albumName+"\"", []), function (err, msg) {
+    self.mpdReady
+        .then(function() {
+            var cmd = libMpd.cmd;
+            self.clientMpd.sendCommand(cmd("find genre \"" + albumName + "\"", []), function (err, msg) {
+                var albums=[];
+                var artists=[];
 
-        var list = [];
-        if (msg) {
-            var path;
-            var name;
-            var lines = msg.split('\n');
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                if (line.indexOf('file:') === 0) {
-                    var path = line.slice(6);
-                    var name = path.split('/').pop();
+                var list = [];
+                if (msg) {
+                    var path;
+                    var name;
+                    var lines = msg.split('\n');
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.indexOf('file:') === 0) {
+                            var path = line.slice(6);
+                            var name = path.split('/').pop();
 
-                    var artist = self.searchFor(lines, i + 1, 'Artist:');
-                    var album = self.searchFor(lines, i + 1, 'Album:');
-                    var title = self.searchFor(lines, i + 1, 'Title:');
-                    var albumart=self.getAlbumArt({artist: artist, album: album}, '/mnt/'+path);
+                            var artist = self.searchFor(lines, i + 1, 'Artist:');
+                            var album = self.searchFor(lines, i + 1, 'Album:');
+                            var title = self.searchFor(lines, i + 1, 'Title:');
+                            var albumart = self.getAlbumArt({artist: artist, album: album}, '/mnt/' + path);
 
-                    if (title) {
-                        title = title;
-                    } else {
-                        title = name;
+                            if (title) {
+                                title = title;
+                            } else {
+                                title = name;
+                            }
+                            list.push({
+                                service: 'mpd',
+                                type: 'song',
+                                title: title,
+                                artist: artist,
+                                album: album,
+                                albumart: albumart,
+                                uri: 'genres/' + path
+                            });
+
+
+                            if(albums.indexOf(album)===-1)
+                                albums.push(album);
+
+                            if(artists.indexOf(artist)===-1)
+                                artists.push(artist);
+
+                        }
+
                     }
-                    list.push({
-                        service: 'mpd',
-                        type: 'song',
-                        title: title,
-                        artist: artist,
-                        album: album,
-                        albumart: albumart,
-                        uri: 'genres/'+path
+
+
+                    var result=[];
+
+                    result.push({type:'title',title:'Artists'});
+                    for(var i in artists)
+                        result.push({type: 'folder', title: artists[i], icon: 'fa fa-list-ol', uri: 'artists/' + artists[i]});
+
+                    result.push({type:'title',title:'Albums'});
+                    for(var i in albums)
+                        result.push({type: 'folder', title: albums[i], icon: 'fa fa-list-ol', uri: 'albums/' + albums[i]});
+
+                    result.push({type:'title',title:'Songs'});
+                    result=result.concat(list);
+
+                    defer.resolve({
+                        navigation: {
+                            prev: {
+                                uri: 'genres'
+                            },
+                            list: result
+                        }
                     });
+
+                }
+                else
+                {
+                    self.logger.info(err);
+                    defer.reject(new Error());
                 }
 
-            }
-        }
-        else self.logger.info(err);
 
-        defer.resolve({
-            navigation: {
-                prev: {
-                    uri: 'genres'
-                },
-                list: list
-            }
+            });
         });
-    });
     return defer.promise;
 
 };
