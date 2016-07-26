@@ -1845,7 +1845,7 @@ ControllerMpd.prototype.listGenreSongs = function (curUri) {
                         title: title,
                         artist: artist,
                         album: album,
-                        icon: albumart,
+                        albumart: albumart,
                         uri: 'genres/'+path
                     });
                 }
