@@ -1614,12 +1614,13 @@ ControllerMpd.prototype.listArtist = function (curUri) {
         .then(function()
         {
             var artist=splitted[1];
-            var albums=[];
+
 
             var cmd = libMpd.cmd;
 
             self.clientMpd.sendCommand(cmd("find artist \""+artist+"\"", []), function (err, msg) {
                 var list = [];
+                var albums=[];
                 if (msg) {
                     var path;
                     var name;
@@ -1650,22 +1651,37 @@ ControllerMpd.prototype.listArtist = function (curUri) {
                                 uri: 'artists/'+path
                             });
 
-                            if(albums.indexOf(album)==-1)
+                            if(albums.indexOf(album)===-1)
                                 albums.push(album);
                         }
 
                     }
-                }
-                else self.logger.info(err);
 
-                defer.resolve({
-                    navigation: {
-                        prev: {
-                            uri: 'artists'
-                        },
-                        list: albums.concat(list)
-                    }
-                });
+                    var result=[];
+                    result.push({type:'title',title:'Albums'});
+                    for(var i in albums)
+                        result.push({type: 'folder', title: albums[i], icon: 'fa fa-list-ol', uri: 'albums/' + albums[i]});
+
+                    result.push({type:'title',title:'Songs'});
+                    result=result.concat(list);
+
+
+                    defer.resolve({
+                        navigation: {
+                            prev: {
+                                uri: 'artists'
+                            },
+                            list: result
+                        }
+                    });
+
+
+                }
+                else
+                {
+                    self.logger.info(err);
+                    defer.reject(new Error());
+                }
             });
         });
 
