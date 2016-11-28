@@ -54,6 +54,18 @@ function InterfaceWebUI(context) {
 						return self.logDone(timeStart);
 					});
 			});
+
+			// 2016/11/28 matuoka add start
+			// Set Volatile
+			connWebSocket.on('setVolatile', function (ServiceName) {
+				self.commandRouter.volumioSetVolatile(ServiceName);
+			};
+			// UnSet Volatile
+			connWebSocket.on('unSetVolatile', function () {
+				self.commandRouter.volumioUnSetVolatile();
+			};
+			// 2016/11/28 matuoka add end
+
 			/* Error handling: causes  Maximum call stack size exceeded
 			 connWebSocket.on('error', function () {
 			 selfConnWebSocket = this;

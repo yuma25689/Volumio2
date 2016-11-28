@@ -1438,3 +1438,16 @@ CoreCommandRouter.prototype.checkAndPerformSystemUpdates = function () {
 
     }
 }
+
+// 2016/11/28 matuoka add start
+// Volumio Set Volatile
+CoreCommandRouter.prototype.volumioSetVolatile = function (ServiceName) {
+	this.pushConsoleMessage('CoreCommandRouter::volumioSetVolatile');
+	this.stateMachine.setVolatile(ServiceName);
+};
+// Volumio UnSet Volatile
+CoreCommandRouter.prototype.volumioUnSetVolatile = function () {
+	this.pushConsoleMessage('CoreCommandRouter::volumioUnSetVolatile');
+	this.stateMachine.unSetVolatile();
+};
+// 2016/11/28 matuoka add end
