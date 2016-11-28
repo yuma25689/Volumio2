@@ -1,13 +1,23 @@
 general =
 {
     name = "${name}";
-log_verbosity = 0;
+//log_verbosity = 0;
+	log_verbosity = 3;
 };
 
 alsa =
 {
   output_device = "${device}";
 };
+
+metadata =
+{
+	enabled = "yes";
+//	include_cover_art = "yes"
+	socket_address = "226.0.0.1";
+	socket_port = 5555;
+
+}
 
 sessioncontrol =
 {

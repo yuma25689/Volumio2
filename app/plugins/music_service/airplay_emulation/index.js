@@ -4,6 +4,7 @@ var fs = require('fs-extra');
 var exec = require('child_process').exec;
 var config = new (require('v-conf'))();
 var libQ = require('kew');
+var dgram = require('dgram'); // 2016/11/28 matuoka add
 
 // Define the UpnpInterface class
 module.exports = AirPlayInterface;
@@ -13,6 +14,7 @@ function AirPlayInterface(context) {
 	// Save a reference to the parent commandRouter
 	this.context = context;
 	this.commandRouter = this.context.coreCommand;
+    this.logger = this.context.logger;  // 2016/11/28 matuoka add
 
 }
 
@@ -101,6 +103,18 @@ function startAirPlay(self) {
 		}
 		else {
 			self.context.coreCommand.pushConsoleMessage('[' + Date.now() + '] Shairport-Sync Started');
+            // 2016/11/28 matuoka add start
+            var socket = dgram.createSocket('udp4');
+            socket.bind(5555, function() {
+                socket.addMembership('226.0.0.1');
+                self.context.coreCommand.pushConsoleMessage('udp airplay track infos receive start');
+            });
+            socket.on('message', function(msg, rinfo) {
+                self.logger.info('ReceiveAirPlayData---');
+                var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
+                self.logger.info(log);
+            });
+            // 2016/11/28 matuoka add end
 		}
 	});
 }
