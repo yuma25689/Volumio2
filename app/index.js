@@ -82,7 +82,8 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info('ReceiveAirPlayData---');
         var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
         self.logger.info(log);
-        var decodeMsg = new Buffer(msg, 'base64').toString();
+        var decodeData = new Buffer(msg, 'base64');
+        var decodeMsg = decodeData.toString('utf8');
         self.logger.info(decodeMsg);
 
         // TODO: convert msg to string and set variable lastAirPlay
