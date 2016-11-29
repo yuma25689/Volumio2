@@ -71,9 +71,9 @@ CoreStateMachine.prototype.getState = function () {
         		artist: 'airPlayArtist',
         		album: 'airPlayAlbum',
         		albumart: '/albumart',
-        		uri: null,
-        		trackType: 'airplaytracktype',//lastAirPlayGenre,
-        		position: 0,
+        		uri: 'testUri',
+        		trackType: 'airplaytracktype',//mp3
+        		position: 'testposition',
         		seek: 0,
         		duration: 0,
         		samplerate: '',

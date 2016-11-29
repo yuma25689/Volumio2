@@ -1127,6 +1127,7 @@ CoreCommandRouter.prototype.volumioPlay = function (N) {
 	this.pushConsoleMessage('CoreCommandRouter::volumioPlay');
 
     this.stateMachine.unSetVolatile();
+    this.stateMachine.unSetAirPlaye();	// 2016/11/28 matuoka add
 
 	if(N===undefined)
 		return this.stateMachine.play();
