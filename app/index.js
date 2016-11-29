@@ -86,31 +86,31 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         // TODO: convert msg to string and set variable lastAirPlay
 
 
-        if( this.stateMachine.probablyAirPlay() )
+        if( self.stateMachine.probablyAirPlay() )
         {
         	// warning: call stateMachine internal method(syncState)
         	// {status: sStatus, position: nPosition, seek: nSeek, duration: nDuration, samplerate: nSampleRate, bitdepth: nBitDepth, channels: nChannels, dynamictitle: sTitle}
-		   //          status: this.volatileState.status,
-		   //          title: this.volatileState.title,
-		   //          artist: this.volatileState.artist,
-		   //          album: this.volatileState.album,
-		   //          albumart: this.volatileState.albumart,
-		   //          uri: this.volatileState.uri,
-		   //          trackType: this.volatileState.trackType,
-		   //          seek: this.volatileState.seek,
-		   //          duration: this.volatileState.duration,
-		   //          samplerate: this.volatileState.samplerate,
-		   //          bitdepth: this.volatileState.bitdepth,
-		   //          channels: this.volatileState.channels,
+		   //          status: self.volatileState.status,
+		   //          title: self.volatileState.title,
+		   //          artist: self.volatileState.artist,
+		   //          album: self.volatileState.album,
+		   //          albumart: self.volatileState.albumart,
+		   //          uri: self.volatileState.uri,
+		   //          trackType: self.volatileState.trackType,
+		   //          seek: self.volatileState.seek,
+		   //          duration: self.volatileState.duration,
+		   //          samplerate: self.volatileState.samplerate,
+		   //          bitdepth: self.volatileState.bitdepth,
+		   //          channels: self.volatileState.channels,
 		   //          random: false,
 		   //          repeat: false,
 		   //          consume: false,
-		   //          volume: this.currentVolume,
-		   //          mute: this.currentMute,
+		   //          volume: self.currentVolume,
+		   //          mute: self.currentMute,
 		   //          stream: false,
 		   //          updatedb: false,
 		   // volatile: true,
-		   //          service: this.volatileState.service
+		   //          service: self.volatileState.service
         // trackBlock.trackType = 'webradio';
         // trackBlock.bitdepth = '';
         // trackBlock.samplerate = '';
@@ -132,7 +132,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         		dynamictitle: 'testDynamicTitle',
         		service: 'AirPlay'
         	};
-        	this.stateMachine.syncAirPlayState(stateService);
+        	self.stateMachine.syncAirPlayState(stateService);
         }
     });
     // 2016/11/28 matuoka add end
@@ -1513,16 +1513,17 @@ CoreCommandRouter.prototype.checkAndPerformSystemUpdates = function () {
 // 2016/11/28 matuoka add start
 CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioStartAirPlaySession');
-	//this.stateMachine.setAirPlay();
+	this.stateMachine.setAirPlay();
 	var data = {'service': 'AirPlay', 'callback': undefined};
-	this.stateMachine.setVolatile(data);
+	//this.stateMachine.setVolatile(data);
+	this.stateMachine.setAirPlay();
 	return 'status change to startAirPlay';
 };
 // Volumio UnSet Volatile
 CoreCommandRouter.prototype.volumioCloseAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioCloseAirPlaySession');
-	//this.stateMachine.unSetAirPlay();
-	this.stateMachine.unSetVolatile();
+	this.stateMachine.unSetAirPlay();
+	//this.stateMachine.unSetVolatile();
 	return 'status change to closeAirPlay';
 };
 // Volumio Set Volatile

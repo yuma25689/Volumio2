@@ -17,7 +17,7 @@ function CoreStateMachine(commandRouter) {
     this.volatileService="";
     this.volatileState={};
 	this.isVolatile = false;
-	//this.isAirPlay = false;	// 2016/11/28 matuoka add
+	this.isAirPlay = false;	// 2016/11/28 matuoka add
 
 	this.logger=this.commandRouter.logger;
 
@@ -59,7 +59,35 @@ CoreStateMachine.prototype.getState = function () {
     }
     else
     {
-        var trackBlock = this.getTrack(this.currentPosition);
+    	// 2016/11/29 matuoka upd start
+        //var trackBlock = this.getTrack(this.currentPosition);
+        var trackBlock = undefined;
+        if( this.isAirPlay )
+        {
+        	var trackBlock = {
+        		name: 'testName',
+        		status: 'play',
+        		title: 'testTitle',
+        		artist: 'airPlayArtist',
+        		album: 'airPlayAlbum',
+        		albumart: '/albumart',
+        		uri: null,
+        		trackType: 'airplaytracktype',//lastAirPlayGenre,
+        		position: 0,
+        		seek: 0,
+        		duration: 0,
+        		samplerate: '',
+        		bitdepth: '',
+        		channels: 2,
+        		dynamictitle: 'testDynamicTitle',
+        		service: 'AirPlay'
+        	};
+        }
+        else
+        {
+        	trackBlock = this.getTrack(this.currentPosition);
+        }
+        // 2016/11/29 matuoka upd end
         if(trackBlock===undefined )
         {
             return {
@@ -1136,21 +1164,9 @@ CoreStateMachine.prototype.unSetVolatile = function () {
     this.isVolatile=false;
 }
 
-CoreStateMachine.prototype.setVolatile = function (data) {
-
-
-    this.volatileService=data.service;
-    this.isVolatile=true;
-
-    /**
-     * This function will be called on volatile stop
-     */
-    this.volatileCallback=data.callback;
-};
-
 // 2016/11/28 matuoka add start
 CoreStateMachine.prototype.probablyAirPlay = function () {
-	if( this.isVolatile && this.volatileState === "AirPlay" )
+	if( this.isAirPlay )
 	{
 		return true;
 	}
@@ -1160,25 +1176,25 @@ CoreStateMachine.prototype.probablyAirPlay = function () {
 	}
 };
 
-CoreStateMachine.prototype.syncAirPlayState = function (stateService) {
-	var  self = this;
-	this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::syncAirPlayState');
+// CoreStateMachine.prototype.syncAirPlayState = function (stateService) {
+// 	var  self = this;
+// 	this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::syncAirPlayState');
 
-	this.volatileService = stateService.service;
-    this.currentStatus='play';
-    this.volatileState=stateService;
-    this.pushState().fail(this.pushError.bind(this));
-};
+// 	this.volatileService = stateService.service;
+//     this.currentStatus='play';
+//     this.volatileState=stateService;
+//     this.pushState().fail(this.pushError.bind(this));
+// };
 
-// CoreStateMachine.prototype.setAirPlay = function () {
-//     console.log("SET AIRPLAY");
+CoreStateMachine.prototype.setAirPlay = function () {
+    console.log("SET AIRPLAY");
 
-//     this.isAirPlay=true;
-// }
+    this.isAirPlay=true;
+}
 
-// CoreStateMachine.prototype.unSetAirPlay = function () {
-//     console.log("UNSET AIRPLAY");
+CoreStateMachine.prototype.unSetAirPlay = function () {
+    console.log("UNSET AIRPLAY");
 
-//     this.isAirPlay=false;
-// }
+    this.isAirPlay=false;
+}
 // 2016/11/28 matuoka add end
