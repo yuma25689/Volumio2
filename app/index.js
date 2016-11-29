@@ -6,6 +6,7 @@ var fs = require('fs-extra');
 var execSync = require('child_process').execSync;
 var winston = require('winston');
 var vconf = require('v-conf');
+var dgram = require('dgram'); // 2016/11/28 matuoka add
 
 
 // Define the CoreCommandRouter class
@@ -64,7 +65,77 @@ function CoreCommandRouter(server) {
 
     this.pushConsoleMessage('BOOT COMPLETED');
 
+    this.craeteAirPlayTrackReceiver();	// 2016/11/28 matuoka add
+
     this.startupSound();
+}
+
+// 2016/11/28 matuoka add start
+function craeteAirPlayTrackReceiver()
+{
+    var socket = dgram.createSocket('udp4');
+    socket.bind(5555, function() {
+        socket.addMembership('226.0.0.1');
+        this.logger.info('udp airplay track infos receive start');
+    });
+    socket.on('message', function(msg, rinfo) {
+        this.logger.info('ReceiveAirPlayData---');
+        var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
+        this.logger.info(log);
+
+        // TODO: convert msg to string and set variable lastAirPlay
+
+
+        if( this.stateMachine.isVolatile && this.stateMachine.volatileService === "AirPlay" )
+        {
+        	// warning: call stateMachine internal method(syncState)
+        	// {status: sStatus, position: nPosition, seek: nSeek, duration: nDuration, samplerate: nSampleRate, bitdepth: nBitDepth, channels: nChannels, dynamictitle: sTitle}
+		   //          status: this.volatileState.status,
+		   //          title: this.volatileState.title,
+		   //          artist: this.volatileState.artist,
+		   //          album: this.volatileState.album,
+		   //          albumart: this.volatileState.albumart,
+		   //          uri: this.volatileState.uri,
+		   //          trackType: this.volatileState.trackType,
+		   //          seek: this.volatileState.seek,
+		   //          duration: this.volatileState.duration,
+		   //          samplerate: this.volatileState.samplerate,
+		   //          bitdepth: this.volatileState.bitdepth,
+		   //          channels: this.volatileState.channels,
+		   //          random: false,
+		   //          repeat: false,
+		   //          consume: false,
+		   //          volume: this.currentVolume,
+		   //          mute: this.currentMute,
+		   //          stream: false,
+		   //          updatedb: false,
+		   // volatile: true,
+		   //          service: this.volatileState.service
+        // trackBlock.trackType = 'webradio';
+        // trackBlock.bitdepth = '';
+        // trackBlock.samplerate = '';
+
+        	var stateService = {
+        		status: 'play',
+        		title: 'testTitle' + rinfo.address + ':' + rinfo.port,
+        		artist: lastAirPlayArtist,
+        		album: lastAirPlayAlbum,
+        		albumart: '/albumart',
+        		uri: null,
+        		trackType: '',//lastAirPlayGenre,
+        		position: 0,
+        		seek: 0,
+        		duration: 0,
+        		samplerate: '',
+        		bitdepth: '',
+        		channels: 2,
+        		dynamictitle: 'testDynamicTitle',
+        		service: 'AirPlay'
+        	};
+        	this.stateMachine.syncState(stateService,'AirPlay');
+        }
+    });
+    // 2016/11/28 matuoka add end
 }
 
 // Methods usually called by the Client Interfaces ----------------------------------------------------------------------------
