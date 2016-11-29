@@ -114,25 +114,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         // trackBlock.trackType = 'webradio';
         // trackBlock.bitdepth = '';
         // trackBlock.samplerate = '';
-
-        	var stateService = {
-        		status: 'play',
-        		title: 'testTitle' + rinfo.address + ':' + rinfo.port,
-        		artist: lastAirPlayArtist,
-        		album: lastAirPlayAlbum,
-        		albumart: '/albumart',
-        		uri: null,
-        		trackType: '',//lastAirPlayGenre,
-        		position: 0,
-        		seek: 0,
-        		duration: 0,
-        		samplerate: '',
-        		bitdepth: '',
-        		channels: 2,
-        		dynamictitle: 'testDynamicTitle',
-        		service: 'AirPlay'
-        	};
-        	self.stateMachine.syncAirPlayState(stateService);
+        	self.stateMachine.pushState();
         }
     });
     // 2016/11/28 matuoka add end
