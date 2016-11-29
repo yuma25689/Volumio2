@@ -1149,6 +1149,27 @@ CoreStateMachine.prototype.setVolatile = function (data) {
 };
 
 // 2016/11/28 matuoka add start
+CoreStateMachine.prototype.probablyAirPlay = function () {
+	if( this.isVolatile && this.volatileState === "AirPlay" )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+};
+
+CoreStateMachine.prototype.syncAirPlayState = function (stateService) {
+	var  self = this;
+	this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::syncAirPlayState');
+
+	this.volatileService = stateService.service;
+    this.currentStatus='play';
+    this.volatileState=stateService;
+    this.pushState().fail(this.pushError.bind(this));
+};
+
 // CoreStateMachine.prototype.setAirPlay = function () {
 //     console.log("SET AIRPLAY");
 

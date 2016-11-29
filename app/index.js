@@ -65,28 +65,28 @@ function CoreCommandRouter(server) {
 
     this.pushConsoleMessage('BOOT COMPLETED');
 
-    this.craeteAirPlayTrackReceiver();	// 2016/11/28 matuoka add
+    this.createAirPlayTrackReceiver();	// 2016/11/28 matuoka add
 
     this.startupSound();
 }
 
 // 2016/11/28 matuoka add start
-function craeteAirPlayTrackReceiver()
-{
+CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
+	var self = this;
     var socket = dgram.createSocket('udp4');
     socket.bind(5555, function() {
         socket.addMembership('226.0.0.1');
-        this.logger.info('udp airplay track infos receive start');
+        self.logger.info('udp airplay track infos receive start');
     });
     socket.on('message', function(msg, rinfo) {
-        this.logger.info('ReceiveAirPlayData---');
+        self.logger.info('ReceiveAirPlayData---');
         var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
-        this.logger.info(log);
+        self.logger.info(log);
 
         // TODO: convert msg to string and set variable lastAirPlay
 
 
-        if( this.stateMachine.isVolatile && this.stateMachine.volatileService === "AirPlay" )
+        if( this.stateMachine.probablyAirPlay() )
         {
         	// warning: call stateMachine internal method(syncState)
         	// {status: sStatus, position: nPosition, seek: nSeek, duration: nDuration, samplerate: nSampleRate, bitdepth: nBitDepth, channels: nChannels, dynamictitle: sTitle}
@@ -132,11 +132,11 @@ function craeteAirPlayTrackReceiver()
         		dynamictitle: 'testDynamicTitle',
         		service: 'AirPlay'
         	};
-        	this.stateMachine.syncState(stateService,'AirPlay');
+        	this.stateMachine.syncAirPlayState(stateService);
         }
     });
     // 2016/11/28 matuoka add end
-}
+};
 
 // Methods usually called by the Client Interfaces ----------------------------------------------------------------------------
 
