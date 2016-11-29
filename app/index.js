@@ -82,6 +82,8 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info('ReceiveAirPlayData---');
         var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
         self.logger.info(log);
+        var decodeMsg = new Buffer(msg, 'base64').toString();
+        self.logger.info(decodeMsg);
 
         // TODO: convert msg to string and set variable lastAirPlay
 
@@ -1127,7 +1129,7 @@ CoreCommandRouter.prototype.volumioPlay = function (N) {
 	this.pushConsoleMessage('CoreCommandRouter::volumioPlay');
 
     this.stateMachine.unSetVolatile();
-    this.stateMachine.unSetAirPlaye();	// 2016/11/28 matuoka add
+    this.stateMachine.unSetAirPlay();	// 2016/11/28 matuoka add
 
 	if(N===undefined)
 		return this.stateMachine.play();
