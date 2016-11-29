@@ -1440,14 +1440,28 @@ CoreCommandRouter.prototype.checkAndPerformSystemUpdates = function () {
 }
 
 // 2016/11/28 matuoka add start
-// Volumio Set Volatile
-CoreCommandRouter.prototype.volumioSetVolatile = function (ServiceName) {
-	this.pushConsoleMessage('CoreCommandRouter::volumioSetVolatile');
-	this.stateMachine.setVolatile(ServiceName);
+CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
+	this.pushConsoleMessage('CoreCommandRouter::volumioStartAirPlaySession');
+	//this.stateMachine.setAirPlay();
+	var data = {'service': 'AirPlay', 'callback': undefined};
+	this.stateMachine.setVolatile(data);
+	return 'status change to startAirPlay';
 };
 // Volumio UnSet Volatile
-CoreCommandRouter.prototype.volumioUnSetVolatile = function () {
-	this.pushConsoleMessage('CoreCommandRouter::volumioUnSetVolatile');
+CoreCommandRouter.prototype.volumioCloseAirPlaySession = function () {
+	this.pushConsoleMessage('CoreCommandRouter::volumioCloseAirPlaySession');
+	//this.stateMachine.unSetAirPlay();
 	this.stateMachine.unSetVolatile();
+	return 'status change to closeAirPlay';
 };
+// Volumio Set Volatile
+// CoreCommandRouter.prototype.volumioSetVolatile = function (ServiceName) {
+// 	this.pushConsoleMessage('CoreCommandRouter::volumioSetVolatile');
+// 	this.stateMachine.setVolatile(ServiceName);
+// };
+// // Volumio UnSet Volatile
+// CoreCommandRouter.prototype.volumioUnSetVolatile = function () {
+// 	this.pushConsoleMessage('CoreCommandRouter::volumioUnSetVolatile');
+// 	this.stateMachine.unSetVolatile();
+// };
 // 2016/11/28 matuoka add end

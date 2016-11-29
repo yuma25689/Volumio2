@@ -17,6 +17,7 @@ function CoreStateMachine(commandRouter) {
     this.volatileService="";
     this.volatileState={};
 	this.isVolatile = false;
+	//this.isAirPlay = false;	// 2016/11/28 matuoka add
 
 	this.logger=this.commandRouter.logger;
 
@@ -1134,3 +1135,29 @@ CoreStateMachine.prototype.unSetVolatile = function () {
     this.volatileService=undefined;
     this.isVolatile=false;
 }
+
+CoreStateMachine.prototype.setVolatile = function (data) {
+
+
+    this.volatileService=data.service;
+    this.isVolatile=true;
+
+    /**
+     * This function will be called on volatile stop
+     */
+    this.volatileCallback=data.callback;
+};
+
+// 2016/11/28 matuoka add start
+// CoreStateMachine.prototype.setAirPlay = function () {
+//     console.log("SET AIRPLAY");
+
+//     this.isAirPlay=true;
+// }
+
+// CoreStateMachine.prototype.unSetAirPlay = function () {
+//     console.log("UNSET AIRPLAY");
+
+//     this.isAirPlay=false;
+// }
+// 2016/11/28 matuoka add end

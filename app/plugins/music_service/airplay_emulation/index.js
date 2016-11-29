@@ -14,8 +14,10 @@ function AirPlayInterface(context) {
 	// Save a reference to the parent commandRouter
 	this.context = context;
 	this.commandRouter = this.context.coreCommand;
-    this.logger = this.context.logger;  // 2016/11/28 matuoka add
-
+	// 2016/11/28 matuoka add start
+	this.stateMachine = this.context.stateMachine;
+    this.logger = this.context.logger;
+	// 2016/11/28 matuoka add end
 }
 
 AirPlayInterface.prototype.onVolumioStart = function () {
@@ -96,6 +98,13 @@ AirPlayInterface.prototype.startShairportSync = function () {
 	});
 };
 
+// 2016/11/28 matuoka add start
+var lastAirPlayArtist = 'airplayArtist';
+var lastAirPlayAlbum = 'airplayAlbum';
+var lastAirPlaySong = 'airplaySong';
+var lastAirPlayGenre = 'airplayGenre';
+// 2016/11/28 matuoka add end
+
 function startAirPlay(self) {
 	exec("sudo systemctl restart airplay", function (error, stdout, stderr) {
 		if (error !== null) {
@@ -113,6 +122,58 @@ function startAirPlay(self) {
                 self.logger.info('ReceiveAirPlayData---');
                 var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
                 self.logger.info(log);
+
+                // TODO: convert msg to string and set variable lastAirPlay~
+
+
+                if( self.stateMachine.isVolatile && self.stateMachine.volatileService === "AirPlay" )
+                {
+                	// warning: call stateMachine internal method(syncState)
+                	// {status: sStatus, position: nPosition, seek: nSeek, duration: nDuration, samplerate: nSampleRate, bitdepth: nBitDepth, channels: nChannels, dynamictitle: sTitle}
+				   //          status: this.volatileState.status,
+				   //          title: this.volatileState.title,
+				   //          artist: this.volatileState.artist,
+				   //          album: this.volatileState.album,
+				   //          albumart: this.volatileState.albumart,
+				   //          uri: this.volatileState.uri,
+				   //          trackType: this.volatileState.trackType,
+				   //          seek: this.volatileState.seek,
+				   //          duration: this.volatileState.duration,
+				   //          samplerate: this.volatileState.samplerate,
+				   //          bitdepth: this.volatileState.bitdepth,
+				   //          channels: this.volatileState.channels,
+				   //          random: false,
+				   //          repeat: false,
+				   //          consume: false,
+				   //          volume: this.currentVolume,
+				   //          mute: this.currentMute,
+				   //          stream: false,
+				   //          updatedb: false,
+				   // volatile: true,
+				   //          service: this.volatileState.service
+                // trackBlock.trackType = 'webradio';
+                // trackBlock.bitdepth = '';
+                // trackBlock.samplerate = '';
+
+                	var stateService = {
+                		status: 'play',
+                		title: 'testTitle',
+                		artist: lastAirPlayArtist,
+                		album: lastAirPlayAlbum,
+                		albumart: '/albumart',
+                		uri: null,
+                		trackType: '',//lastAirPlayGenre,
+                		position: 0,
+                		seek: 0,
+                		duration: 0,
+                		samplerate: '',
+                		bitdepth: '',
+                		channels: 2,
+                		dynamictitle: 'testDynamicTitle',
+                		service: 'AirPlay'
+                	};
+                	self.stateMachine.syncState(stateService,'AirPlay');
+                }
             });
             // 2016/11/28 matuoka add end
 		}

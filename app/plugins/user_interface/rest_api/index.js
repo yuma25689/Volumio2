@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 module.exports = interfaceApi;
 
-function interfaceApi(context) {
+function interfaceApi(context) {    
     var self = this;
 
     self.context = context;
@@ -174,7 +174,30 @@ function interfaceApi(context) {
             else
                 res.json(notFound);
         });
+    // 2016/11/28 matuoka add start
+    api.route('/startAirPlaySession')
+        .get(function (req, res) {
 
+
+            var response = self.commandRouter.volumioStartAirPlaySession();
+
+            if (response != undefined)
+                res.json(response);
+            else
+                res.json(notFound);
+        });
+    api.route('/closeAirPlaySession')
+        .get(function (req, res) {
+
+
+            var response = self.commandRouter.volumioCloseAirPlaySession();
+
+            if (response != undefined)
+                res.json(response);
+            else
+                res.json(notFound);
+        });
+    // 2016/11/28 matuoka add end
 }
 
 // Receive console messages from commandRouter and broadcast to all connected clients
