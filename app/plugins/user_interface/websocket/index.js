@@ -59,11 +59,11 @@ function InterfaceWebUI(context) {
 			// Set Volatile
 			connWebSocket.on('setVolatile', function (ServiceName) {
 				self.commandRouter.volumioSetVolatile(ServiceName);
-			};
+			});
 			// UnSet Volatile
 			connWebSocket.on('unSetVolatile', function () {
 				self.commandRouter.volumioUnSetVolatile();
-			};
+			});
 			// 2016/11/28 matuoka add end
 
 			/* Error handling: causes  Maximum call stack size exceeded
