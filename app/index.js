@@ -94,24 +94,24 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info(decodeMsg);
 
         // set variable lastAirPlay series for display UI.
-        if( 0 === decodeMsg.indexOf( this.PREFIX_OF_ALBUM ) )
+        if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
         {
-        	var name = decodeMsg.replace( this.PREFIX_OF_ALBUM );
+        	var name = decodeMsg.replace( self.PREFIX_OF_ALBUM );
         	self.stateMachine.setAirPlayAlbum(name);
         }
-        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_ARTIST ) )
+        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ARTIST ) )
         {
-        	var name = decodeMsg.replace( this.PREFIX_OF_ARTIST );
+        	var name = decodeMsg.replace( self.PREFIX_OF_ARTIST );
         	self.stateMachine.setAirPlayArtist(name);
         }
-        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_TRACK_NAME ) )
+        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_TRACK_NAME ) )
         {
-        	var name = decodeMsg.replace( this.PREFIX_OF_TRACK_NAME );
+        	var name = decodeMsg.replace( self.PREFIX_OF_TRACK_NAME );
         	self.stateMachine.setAirPlayTrackName(name);
         }
-        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_GENRE ) )
+        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_GENRE ) )
         {
-        	var name = decodeMsg.replace( this.PREFIX_OF_GENRE );
+        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE );
         	self.stateMachine.setAirPlayGenre(name);
         }
 

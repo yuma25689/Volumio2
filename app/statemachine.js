@@ -25,7 +25,7 @@ function CoreStateMachine(commandRouter) {
 	this.lastAirPlayGenre = '';
 	this.lastAirPlayTrackType = 'mp3かも';
 	this.lastAirPlayBitDepth = 'たぶん24bit';
-	this.lastAirPlaySampleRate = '44100Hzかも';
+	this.lastAirPlaySampleRate = '44.1KHzかも';
 	// 2016/11/28 matuoka add end
 
 	this.logger=this.commandRouter.logger;
