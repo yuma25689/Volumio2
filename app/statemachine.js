@@ -21,6 +21,7 @@ function CoreStateMachine(commandRouter) {
 	this.isAirPlay = false;
 	this.lastAirPlayArtist = '';
 	this.lastAirPlayAlbum = '';
+	this.lastAirPlayAlbumArt = '/albumart';
 	this.lastAirPlayTrackName = '';
 	this.lastAirPlayGenre = '';
 	this.lastAirPlayTrackType = 'mp3かも';
@@ -79,7 +80,7 @@ CoreStateMachine.prototype.getState = function () {
         		title: 'airplaySampleTitle',
         		artist: this.lastAirPlayArtist,//'airPlayArtist',
         		album: this.lastAirPlayAlbum,//'airPlayAlbum',
-        		albumart: '/albumart',
+        		albumart: this.lastAirPlayAlbumArt,
         		uri: 'testUri',
         		trackType: this.lastAirPlayTrackType, //'airplaytracktype',//mp3
         		position: 'testposition',
@@ -1196,14 +1197,12 @@ CoreStateMachine.prototype.probablyAirPlay = function () {
 // };
 
 CoreStateMachine.prototype.setAirPlay = function () {
-    console.log("SET AIRPLAY");
-
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlay:');
     this.isAirPlay=true;
 }
 
 CoreStateMachine.prototype.unSetAirPlay = function () {
-    console.log("UNSET AIRPLAY");
-
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::unSetAirPlay:');
     this.isAirPlay=false;
 }
 
@@ -1214,6 +1213,10 @@ CoreStateMachine.prototype.setAirPlayArtist = function (name) {
 CoreStateMachine.prototype.setAirPlayAlbum = function (name) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayAlbum:'+name);
     this.lastAirPlayAlbum=name;
+}
+CoreStateMachine.prototype.setAirPlayAlbumArt = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayAlbumArt:'+name);
+    this.lastAirPlayAlbumArt=name;
 }
 CoreStateMachine.prototype.setAirPlayTrackName = function (name) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayTrackName:'+name);

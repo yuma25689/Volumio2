@@ -70,6 +70,21 @@ function CoreCommandRouter(server) {
     this.PREFIX_OF_ARTIST = 'coreasar';
     this.PREFIX_OF_TRACK_NAME = 'coreminm';
     this.PREFIX_OF_GENRE = 'coreasgn';
+    this.PREFIX_OF_PICT = 'ssncPICT';	// payload is picture, either a JPEG or PNG
+    this.PREFIX_OF_STREAM_START = 'ssncpbeg';
+    this.PREFIX_OF_STREAM_END = 'ssncpend';
+
+    // TODO: investigate RTP timestamp convert to second and display
+    this.PREFIX_OF_METADATA_START = 'ssncmdst';
+    // (RTPtimestamp)
+    // 4057092695
+    this.PREFIX_OF_METADATA_END = 'ssncmden';
+    // (RTPtimestamp)
+    // 4057092695
+    this.PREFIX_OF_PROGRESS = 'ssncprgr';
+    // (RTPtimestamp)start/current/end(OF THE ONE SEQUENCE)
+    // 4057002459/4057092695/4071864159
+    // 4057027913/4057116279/4071889613
     this.createAirPlayTrackReceiver();
     // 2016/11/28 matuoka add end
 
@@ -85,66 +100,79 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info('udp airplay track infos receive start');
     });
     socket.on('message', function(msg, rinfo) {
-        self.logger.info('ReceiveAirPlayData---');
-        var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
+        //self.logger.info('ReceiveAirPlayData---');
+        var log = '[AirPlay]Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
         self.logger.info(log);
-        // convert msg to utf-8 string
-        var decodeData = new Buffer(msg, 'base64');
-        var decodeMsg = decodeData.toString('utf8');
-        self.logger.info(decodeMsg);
+		var decodeData = new Buffer(msg, 'base64');
 
-        // set variable lastAirPlay series for display UI.
-        if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
+        if( 0 === decodeData.indexOf( self.PREFIX_OF_PICT) )
         {
-        	var name = decodeMsg.replace( self.PREFIX_OF_ALBUM, '' );
-        	self.stateMachine.setAirPlayAlbum(name);
-        }
-        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ARTIST ) )
-        {
-        	var name = decodeMsg.replace( self.PREFIX_OF_ARTIST, '' );
-        	self.stateMachine.setAirPlayArtist(name);
-        }
-        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_TRACK_NAME ) )
-        {
-        	var name = decodeMsg.replace( self.PREFIX_OF_TRACK_NAME, '' );
-        	self.stateMachine.setAirPlayTrackName(name);
-        }
-        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_GENRE ) )
-        {
-        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE, '' );
-        	self.stateMachine.setAirPlayGenre(name);
-        }
+        	// probably PICTURE...
+        	// TODO: judge PNG or JPEG
+			var ext = 'png';
+        	// TODO: save picture as album art
+        	var albumArtRootFolder = '/data/albumart/web'
 
-        if( self.stateMachine.probablyAirPlay() )
-        {
-        	// warning: call stateMachine internal method(syncState)
-        	// {status: sStatus, position: nPosition, seek: nSeek, duration: nDuration, samplerate: nSampleRate, bitdepth: nBitDepth, channels: nChannels, dynamictitle: sTitle}
-		   //          status: self.volatileState.status,
-		   //          title: self.volatileState.title,
-		   //          artist: self.volatileState.artist,
-		   //          album: self.volatileState.album,
-		   //          albumart: self.volatileState.albumart,
-		   //          uri: self.volatileState.uri,
-		   //          trackType: self.volatileState.trackType,
-		   //          seek: self.volatileState.seek,
-		   //          duration: self.volatileState.duration,
-		   //          samplerate: self.volatileState.samplerate,
-		   //          bitdepth: self.volatileState.bitdepth,
-		   //          channels: self.volatileState.channels,
-		   //          random: false,
-		   //          repeat: false,
-		   //          consume: false,
-		   //          volume: self.currentVolume,
-		   //          mute: self.currentMute,
-		   //          stream: false,
-		   //          updatedb: false,
-		   // volatile: true,
-		   //          service: self.volatileState.service
-        // trackBlock.trackType = 'webradio';
-        // trackBlock.bitdepth = '';
-        // trackBlock.samplerate = '';
-        	self.stateMachine.pushState();
+			var folder = albumArtRootFolder + '/' + artist + '/' + album + '/';
+			var fileName = 'cover' + ext;
+
+			fs.ensureDirSync(folder);
+			this.stateMachine.setAirPlayAlbumArt(folder+fileName);
+			fs.writeFile(folder+fileName, data, function (err) {
+				// async process finish
+				if( err ) {
+					self.logger.info('error occured when album art write');
+					return;
+				}
+			});
+
+			// TODO: albumArtの指定
+
         }
+        else
+        {
+	        // convert msg to utf-8 string
+	        var decodeMsg = decodeData.toString('utf8');
+	        self.logger.info(decodeMsg);
+
+	        if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_START) )
+	        {
+	        	// regard this data as airplay start
+	        	this.stateMachine.setAirPlay();
+	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_END) )
+	        {
+	        	// regard this data as airplay end
+	        	this.stateMachine.unSetAirPlay();
+	        }
+	        // --- set variable lastAirPlay series for display UI. ---
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
+	        {
+	        	var name = decodeMsg.replace( self.PREFIX_OF_ALBUM, '' );
+	        	self.stateMachine.setAirPlayAlbum(name);
+	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ARTIST ) )
+	        {
+	        	var name = decodeMsg.replace( self.PREFIX_OF_ARTIST, '' );
+	        	self.stateMachine.setAirPlayArtist(name);
+	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_TRACK_NAME ) )
+	        {
+	        	var name = decodeMsg.replace( self.PREFIX_OF_TRACK_NAME, '' );
+	        	self.stateMachine.setAirPlayTrackName(name);
+	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_GENRE ) )
+	        {
+	        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE, '' );
+	        	self.stateMachine.setAirPlayGenre(name);
+	        }
+
+	        if( self.stateMachine.probablyAirPlay() )
+	        {
+	        	// it may called too many time
+	        	self.stateMachine.pushState();
+	        }
+	    }
     });
     // 2016/11/28 matuoka add end
 };
