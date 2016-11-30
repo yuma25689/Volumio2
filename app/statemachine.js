@@ -74,9 +74,9 @@ CoreStateMachine.prototype.getState = function () {
         if( this.isAirPlay )
         {
         	var trackBlock = {
-        		name: 'testName',
+        		name: this.lastAirPlayTrackName,
         		status: 'play',
-        		title: this.lastAirPlayTrackName, //'testTitle',
+        		title: 'airplaySampleTitle',
         		artist: this.lastAirPlayArtist,//'airPlayArtist',
         		album: this.lastAirPlayAlbum,//'airPlayAlbum',
         		albumart: '/albumart',
