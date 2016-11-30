@@ -17,7 +17,16 @@ function CoreStateMachine(commandRouter) {
     this.volatileService="";
     this.volatileState={};
 	this.isVolatile = false;
-	this.isAirPlay = false;	// 2016/11/28 matuoka add
+	// 2016/11/28 matuoka add start
+	this.isAirPlay = false;
+	this.lastAirPlayArtist = '';
+	this.lastAirPlayAlbum = '';
+	this.lastAirPlayTrackName = '';
+	this.lastAirPlayGenre = '';
+	this.lastAirPlayTrackType = 'mp3かも';
+	this.lastAirPlayBitDepth = 'たぶん24bit';
+	this.lastAirPlaySampleRate = '44100Hzかも';
+	// 2016/11/28 matuoka add end
 
 	this.logger=this.commandRouter.logger;
 
@@ -67,17 +76,17 @@ CoreStateMachine.prototype.getState = function () {
         	var trackBlock = {
         		name: 'testName',
         		status: 'play',
-        		title: 'testTitle',
-        		artist: 'airPlayArtist',
-        		album: 'airPlayAlbum',
+        		title: this.lastAirPlayTrackName, //'testTitle',
+        		artist: this.lastAirPlayArtist,//'airPlayArtist',
+        		album: this.lastAirPlayAlbum,//'airPlayAlbum',
         		albumart: '/albumart',
         		uri: 'testUri',
-        		trackType: 'airplaytracktype',//mp3
+        		trackType: this.lastAirPlayTrackType, //'airplaytracktype',//mp3
         		position: 'testposition',
         		seek: 0,
         		duration: 0,
-        		samplerate: '',
-        		bitdepth: '',
+        		samplerate: this.lastAirPlaySampleRate,
+        		bitdepth: this.lastAirPlayBitDepth,
         		channels: 2,
         		dynamictitle: 'testDynamicTitle',
         		service: 'AirPlay'
@@ -1196,5 +1205,34 @@ CoreStateMachine.prototype.unSetAirPlay = function () {
     console.log("UNSET AIRPLAY");
 
     this.isAirPlay=false;
+}
+
+CoreStateMachine.prototype.setAirPlayArtist = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayArtist:'+name);
+    this.lastAirPlayArtist=name;
+}
+CoreStateMachine.prototype.setAirPlayAlbum = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayAlbum:'+name);
+    this.lastAirPlayAlbum=name;
+}
+CoreStateMachine.prototype.setAirPlayTrackName = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayTrackName:'+name);
+    this.lastAirPlayTrackName=name;
+}
+CoreStateMachine.prototype.setAirPlayGenre = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayGenre:'+name);
+    this.lastAirPlayGenre=name;
+}
+CoreStateMachine.prototype.setAirPlayTrackType = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayTrackType:'+name);
+    this.lastAirPlayTrackType=name;
+}
+CoreStateMachine.prototype.setAirPlayBitDepth = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayBitDepth:'+name);
+    this.lastAirPlayBitDepth=name;
+}
+CoreStateMachine.prototype.setAirPlaySampleRate = function (name) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlaySampleRate:'+name);
+    this.lastAirPlaySampleRate=name;
 }
 // 2016/11/28 matuoka add end

@@ -65,7 +65,13 @@ function CoreCommandRouter(server) {
 
     this.pushConsoleMessage('BOOT COMPLETED');
 
-    this.createAirPlayTrackReceiver();	// 2016/11/28 matuoka add
+	// 2016/11/28 matuoka add start
+    this.PREFIX_OF_ALBUM = 'coreasal';
+    this.PREFIX_OF_ARTIST = 'coreasar';
+    this.PREFIX_OF_TRACK_NAME = 'coreminm';
+    this.PREFIX_OF_GENRE = 'coreasgn';
+    this.createAirPlayTrackReceiver();
+    // 2016/11/28 matuoka add end
 
     this.startupSound();
 }
@@ -82,12 +88,32 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info('ReceiveAirPlayData---');
         var log = 'Received ' + msg.length + 'bytes from' + rinfo.address + ':' + rinfo.port;
         self.logger.info(log);
+        // convert msg to utf-8 string
         var decodeData = new Buffer(msg, 'base64');
         var decodeMsg = decodeData.toString('utf8');
         self.logger.info(decodeMsg);
 
-        // TODO: convert msg to string and set variable lastAirPlay
-
+        // set variable lastAirPlay series for display UI.
+        if( 0 === decodeMsg.indexOf( this.PREFIX_OF_ALBUM ) )
+        {
+        	var name = decodeMsg.replace( this.PREFIX_OF_ALBUM );
+        	self.stateMachine.setAirPlayAlbum(name);
+        }
+        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_ARTIST ) )
+        {
+        	var name = decodeMsg.replace( this.PREFIX_OF_ARTIST );
+        	self.stateMachine.setAirPlayArtist(name);
+        }
+        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_TRACK_NAME ) )
+        {
+        	var name = decodeMsg.replace( this.PREFIX_OF_TRACK_NAME );
+        	self.stateMachine.setAirPlayTrackName(name);
+        }
+        else if( 0 === decodeMsg.indexOf( this.PREFIX_OF_GENRE ) )
+        {
+        	var name = decodeMsg.replace( this.PREFIX_OF_GENRE );
+        	self.stateMachine.setAirPlayGenre(name);
+        }
 
         if( self.stateMachine.probablyAirPlay() )
         {
