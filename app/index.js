@@ -107,6 +107,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
         if( 0 === decodeData.indexOf( self.PREFIX_OF_PICT) )
         {
+        	self.logger.info('[AirPlay]try to get album art'+folder+fileName);
         	// probably PICTURE...
         	// TODO: judge PNG or JPEG
 			var ext = 'png';
@@ -138,12 +139,12 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_START) )
 	        {
 	        	// regard this data as airplay start
-	        	this.stateMachine.setAirPlay();
+	        	self.stateMachine.setAirPlay();
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_END) )
 	        {
 	        	// regard this data as airplay end
-	        	this.stateMachine.unSetAirPlay();
+	        	self.stateMachine.unSetAirPlay();
 	        }
 	        // --- set variable lastAirPlay series for display UI. ---
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
@@ -1184,7 +1185,6 @@ CoreCommandRouter.prototype.volumioPlay = function (N) {
 	this.pushConsoleMessage('CoreCommandRouter::volumioPlay');
 
     this.stateMachine.unSetVolatile();
-    this.stateMachine.unSetAirPlay();	// 2016/11/28 matuoka add
 
 	if(N===undefined)
 		return this.stateMachine.play();
