@@ -114,10 +114,10 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         	// probably PICTURE...
 			var data = decodeData.slice(8);
         	// TODO: judge PNG or JPEG
-			var ext = 'png';
+			var ext = '.png';
 			if( data.slice(6,10).toString('ascii') === 'JFIF' )
 			{
-				ext = 'jpg';
+				ext = '.jpg';
 	        }
         	// TODO: save picture as album art
         	var albumArtRootFolder = '/data/albumart/web'
