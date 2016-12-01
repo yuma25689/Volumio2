@@ -16,14 +16,14 @@ metadata =
 	include_cover_art = "yes"
 	socket_address = "226.0.0.1";
 	socket_port = 5555;
-
+  socket_msglength = 65000;
 }
 
 sessioncontrol =
 {
   run_this_before_play_begins = "/usr/bin/mpc stop";
   //run_this_before_play_begins = "/volumio/app/plugins/music_service/airplay_emulation/before.sh";
-  run_this_after_play_begins = "/volumio/app/plugins/music_service/airplay_emulation/after.sh";
+  run_this_after_play_ends = "/volumio/app/plugins/music_service/airplay_emulation/after.sh";
   allow_session_interruption = "yes";
 };
 

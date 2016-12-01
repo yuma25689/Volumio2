@@ -111,7 +111,9 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
         if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
         {
-        	self.logger.info('[AirPlay]try to get album art'+folder+fileName);
+			var folder = albumArtRootFolder + '/airplay/';
+			var fileName = 'cover' + ext;
+        	self.logger.info('[AirPlay]try to get album art:'+folder+fileName);
         	// probably PICTURE...
 			var data = decodeData.slice(8);
         	// TODO: judge PNG or JPEG
@@ -122,10 +124,9 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        }
         	// TODO: save picture as album art
         	var albumArtRootFolder = '/data/albumart/web'
-			var folder = albumArtRootFolder + '/' + artist + '/' + album + '/';
-			var fileName = 'cover' + ext;
 
 			fs.ensureDirSync(folder);
+			// overwrite if exists
 			fs.writeFile(folder+fileName, data, function (err) {
 				// async process finish
 				if( err ) {
@@ -134,7 +135,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 				}
 			});
 			self.logger.info('[AirPlay]trying to write file('+folder+fileName+')');
-			this.stateMachine.setAirPlayAlbumArt(folder+fileName);
+			self.stateMachine.setAirPlayAlbumArt(folder+fileName);
         }
         else
         {

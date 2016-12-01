@@ -1238,4 +1238,5 @@ CoreStateMachine.prototype.setAirPlaySampleRate = function (name) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlaySampleRate:'+name);
     this.lastAirPlaySampleRate=name;
 }
+
 // 2016/11/28 matuoka add end
