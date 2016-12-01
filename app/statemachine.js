@@ -426,14 +426,22 @@ CoreStateMachine.prototype.pushState = function () {
 	var state = this.getState();
 
 	var self = this;
-	self.commandRouter.volumioPushState(state)
-		.then(function (data) {
-			self.checkFavourites(state)
-				.then(function (a) {
-					promise.resolve({});
-				})
-		});
-
+	// 2016/12/01 matuoka add start
+	if( this.isAirPlay )
+	{
+		self.commandRouter.volumioPushState(state);
+	}
+	else
+	{
+		// 2016/12/01 matuoka add end
+		self.commandRouter.volumioPushState(state)
+			.then(function (data) {
+				self.checkFavourites(state)
+					.then(function (a) {
+						promise.resolve({});
+					})
+			});
+	}
 	return promise.promise;
 };
 
