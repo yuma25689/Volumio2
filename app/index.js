@@ -113,12 +113,20 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         {
         	self.logger.info('[AirPlay]try to get album art');
         	// probably PICTURE...
-			var data = decodeData.slice(8);
+			var data = msg.slice(8);
         	// TODO: judge PNG or JPEG
 			var ext = '.png';
 			if( data.slice(6,10).toString('ascii') === 'JFIF' )
 			{
 				ext = '.jpg';
+	        }
+			else if( data.slice(2,4).toString('ascii') === 'PNG' )
+			{
+				ext = '.png';
+	        }
+	        else
+	        {
+	        	self.logger.info('AirPlay-GETIMAGE cant judge image format!');
 	        }
         	// TODO: save picture as album art
         	var albumArtRootFolder = '/data/albumart/web'
