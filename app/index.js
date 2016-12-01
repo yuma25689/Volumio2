@@ -111,6 +111,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
         if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
         {
+        	self.logger.info('[AirPlay]try to get album art');
         	// probably PICTURE...
 			var data = decodeData.slice(8);
         	// TODO: judge PNG or JPEG
@@ -123,7 +124,6 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         	var albumArtRootFolder = '/data/albumart/web'
 			var folder = albumArtRootFolder + '/airplay/';
 			var fileName = 'cover' + ext;
-        	self.logger.info('[AirPlay]try to get album art:'+folder+fileName);
 
 			fs.ensureDirSync(folder);
 			// overwrite if exists
