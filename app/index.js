@@ -105,20 +105,27 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         self.logger.info(log);
 		var decodeData = new Buffer(msg, 'base64');
 
-        if( 0 === decodeData.indexOf( self.PREFIX_OF_PICT) )
+		var dataID = decodeData.slice(0,8);
+		var dataIDStr = dataID.toString('ascii');
+		self.logger.info('AiryPlay_DataID='+dataIDStr);
+
+        if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
         {
         	self.logger.info('[AirPlay]try to get album art'+folder+fileName);
         	// probably PICTURE...
+			var data = decodeData.slice(8);
         	// TODO: judge PNG or JPEG
 			var ext = 'png';
+			if( data.slice(6,10).toString('ascii') === 'JFIF' )
+			{
+				ext = 'jpg';
+	        }
         	// TODO: save picture as album art
         	var albumArtRootFolder = '/data/albumart/web'
-
 			var folder = albumArtRootFolder + '/' + artist + '/' + album + '/';
 			var fileName = 'cover' + ext;
 
 			fs.ensureDirSync(folder);
-			this.stateMachine.setAirPlayAlbumArt(folder+fileName);
 			fs.writeFile(folder+fileName, data, function (err) {
 				// async process finish
 				if( err ) {
@@ -126,15 +133,14 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 					return;
 				}
 			});
-
-			// TODO: albumArtの指定
-
+			self.logger.info('[AirPlay]trying to write file('+folder+fileName+')');
+			this.stateMachine.setAirPlayAlbumArt(folder+fileName);
         }
         else
         {
-	        // convert msg to utf-8 string
-	        var decodeMsg = decodeData.toString('utf8');
-	        self.logger.info(decodeMsg);
+			// convert msg to utf-8 string
+			var decodeMsg = decodeData.toString('utf8');
+			self.logger.info(decodeMsg);
 
 	        if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_START) )
 	        {
