@@ -24,7 +24,7 @@ function CoreStateMachine(commandRouter) {
 	this.lastAirPlayAlbumArt = '/albumart';
 	this.lastAirPlayTrackName = '';
 	this.lastAirPlayGenre = '';
-	this.lastAirPlayTrackType = 'mp3かも';
+	this.lastAirPlayTrackType = 'mp3';
 	this.lastAirPlayBitDepth = 'たぶん24bit';
 	this.lastAirPlaySampleRate = '44.1KHzかも';
 	// 2016/11/28 matuoka add end
@@ -83,14 +83,14 @@ CoreStateMachine.prototype.getState = function () {
         		albumart: this.lastAirPlayAlbumArt,
         		uri: 'testUri',
         		trackType: this.lastAirPlayTrackType, //'airplaytracktype',//mp3
-        		position: 'testposition',
+        		position: 0,
         		seek: 0,
         		duration: 0,
         		samplerate: this.lastAirPlaySampleRate,
         		bitdepth: this.lastAirPlayBitDepth,
         		channels: 2,
         		dynamictitle: 'testDynamicTitle',
-        		service: 'AirPlay'
+        		service: 'airplay'
         	};
         }
         else

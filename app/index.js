@@ -107,7 +107,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
 		var dataID = decodeData.slice(0,8);
 		var dataIDStr = dataID.toString('ascii');
-		self.logger.info('AiryPlay_DataID='+dataIDStr);
+		self.logger.info('AirPlay_DataID='+dataIDStr);
 
         if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
         {
@@ -1569,7 +1569,7 @@ CoreCommandRouter.prototype.checkAndPerformSystemUpdates = function () {
 CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioStartAirPlaySession');
 	this.stateMachine.setAirPlay();
-	var data = {'service': 'AirPlay', 'callback': undefined};
+	var data = {'service': 'airplay', 'callback': undefined};
 	//this.stateMachine.setVolatile(data);
 	this.stateMachine.setAirPlay();
 	return 'status change to startAirPlay';
