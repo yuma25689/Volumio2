@@ -137,17 +137,18 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
 			var folder = deployRootFolder + deployPath;
 			var fileName = 'cover' + ext;
+			var filePathForWrite = folder+'/'+fileName;
 
 			fs.ensureDirSync(folder);
 			// overwrite if exists
-			fs.writeFile(folder+fileName, data, function (err) {
+			fs.writeFile(filePathForWrite, data, function (err) {
 				// async process finish
 				if( err ) {
 					self.logger.info('error occured when album art write');
 					return;
 				}
 			});
-			self.logger.info('[AirPlay]trying to write file('+folder+fileName+')');
+			self.logger.info('[AirPlay]trying to write file('+filePathForWrite+')');
 
         	var path = '?path=' + nodetools.urlEncode(deployPath);
         	var albumArtRootFolder = '/albumart'
