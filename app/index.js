@@ -6,8 +6,10 @@ var fs = require('fs-extra');
 var execSync = require('child_process').execSync;
 var winston = require('winston');
 var vconf = require('v-conf');
-var dgram = require('dgram'); // 2016/11/28 matuoka add
-
+// 2016/11/28 matuoka add start
+var nodetools = require('nodetools');
+var dgram = require('dgram');
+// 2016/11/28 matuoka add end
 
 // Define the CoreCommandRouter class
 module.exports = CoreCommandRouter;
@@ -118,6 +120,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 			var ext = '.png';
 			if( data.slice(6,10).toString('ascii') === 'JFIF' )
 			{
+				// TODO: 0xFFF8FFFB など
 				ext = '.jpg';
 	        }
 			else if( data.slice(2,4).toString('ascii') === 'PNG' )
@@ -129,8 +132,10 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        	self.logger.info('AirPlay-GETIMAGE cant judge image format!');
 	        }
         	// TODO: save picture as album art
-        	var albumArtRootFolder = '/data/albumart/web'
-			var folder = albumArtRootFolder + '/airplay/';
+        	var deployRootFolder = '/mnt';
+        	var deployPath = '/INTERNAL/airplay';
+
+			var folder = deployRootFolder + deployPath;
 			var fileName = 'cover' + ext;
 
 			fs.ensureDirSync(folder);
@@ -144,9 +149,9 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 			});
 			self.logger.info('[AirPlay]trying to write file('+folder+fileName+')');
 
-        	var web = '?web=' + nodetools.urlEncode('airplay') + '/';
+        	var path = '?path=' + nodetools.urlEncode(deployPath);
         	var albumArtRootFolder = '/albumart'
-			var albumartUri = albumArtRootFolder + web;
+			var albumartUri = albumArtRootFolder + path;
 			self.logger.info('[AirPlay]albumart uri='+albumartUri);
 
 			self.stateMachine.setAirPlayAlbumArt(albumartUri);
