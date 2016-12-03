@@ -136,7 +136,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
         	var deployRootFolder = '/mnt';
         	self.airplayAlbumDeployPath = '/INTERNAL/airplay';
 
-			var folder = deployRootFolder + deployPath;
+			var folder = deployRootFolder + self.airplayAlbumDeployPath;
 			var fileName = 'cover' + ext;
 			var filePathForWrite = folder+'/'+fileName;
 
