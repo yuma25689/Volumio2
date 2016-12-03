@@ -133,7 +133,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        }
         	// TODO: save picture as album art
         	var deployRootFolder = '/mnt';
-        	var deployPath = '/INTERNAL/airplay';
+        	self.airplayAlbumDeployPath = '/INTERNAL/airplay';
 
 			var folder = deployRootFolder + deployPath;
 			var fileName = 'cover' + ext;
@@ -141,21 +141,25 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 
 			fs.ensureDirSync(folder);
 			// overwrite if exists
+			self.logger.info('[AirPlay]trying to write file('+filePathForWrite+')');
 			fs.writeFile(filePathForWrite, data, function (err) {
 				// async process finish
 				if( err ) {
 					self.logger.info('error occured when album art write');
 					return;
 				}
+	        	var path = '?path=' + nodetools.urlEncode(self.airplayAlbumDeployPath);
+				var albumartUri = '/albumart' + path;
+				self.logger.info('[AirPlay]albumart uri='+albumartUri);
+
+				self.stateMachine.setAirPlayAlbumArt(albumartUri);
+		        if( self.stateMachine.probablyAirPlay() )
+		        {
+	    	    	// it may called too many time
+	        		self.stateMachine.pushState();
+	        	}
 			});
-			self.logger.info('[AirPlay]trying to write file('+filePathForWrite+')');
 
-        	var path = '?path=' + nodetools.urlEncode(deployPath);
-        	var albumArtRootFolder = '/albumart'
-			var albumartUri = albumArtRootFolder + path;
-			self.logger.info('[AirPlay]albumart uri='+albumartUri);
-
-			self.stateMachine.setAirPlayAlbumArt(albumartUri);
         }
         else
         {
@@ -194,12 +198,15 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE, '' );
 	        	self.stateMachine.setAirPlayGenre(name);
 	        }
-
-	        if( self.stateMachine.probablyAirPlay() )
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_END ) )
 	        {
-	        	// it may called too many time
-	        	self.stateMachine.pushState();
+		        if( self.stateMachine.probablyAirPlay() )
+		        {
+		        	// it may called too many time
+		        	self.stateMachine.pushState();
+		        }
 	        }
+
 	    }
     });
     // 2016/11/28 matuoka add end
