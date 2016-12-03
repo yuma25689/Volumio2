@@ -68,7 +68,7 @@ function CoreCommandRouter(server) {
     this.pushConsoleMessage('BOOT COMPLETED');
 
 	// 2016/11/28 matuoka add start
-	self.airplayAlbumDeployPath = '';
+	this.airplayAlbumDeployPath = '';
     this.PREFIX_OF_ALBUM = 'coreasal';
     this.PREFIX_OF_ARTIST = 'coreasar';
     this.PREFIX_OF_TRACK_NAME = 'coreminm';
