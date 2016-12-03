@@ -143,7 +143,13 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 				}
 			});
 			self.logger.info('[AirPlay]trying to write file('+folder+fileName+')');
-			self.stateMachine.setAirPlayAlbumArt(folder+fileName);
+
+        	var web = '?web=' + nodetools.urlEncode('airplay') + '/';
+        	var albumArtRootFolder = '/albumart'
+			var albumartUri = albumArtRootFolder + web;
+			self.logger.info('[AirPlay]albumart uri='+albumartUri);
+
+			self.stateMachine.setAirPlayAlbumArt(albumartUri);
         }
         else
         {
