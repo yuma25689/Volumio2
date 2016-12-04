@@ -223,7 +223,7 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_START) )
 	        {
-	        	self.airplayAlbumDeployPath = '';
+	        	self.receiveAlbumImagePath = '';
 				self.receiveAirplayArtist = '';
 				self.receiveAirplayAlbum = '';
 	        }
