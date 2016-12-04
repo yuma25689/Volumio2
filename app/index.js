@@ -1624,7 +1624,7 @@ CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
 CoreCommandRouter.prototype.volumioCloseAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioCloseAirPlaySession');
 	this.stateMachine.unSetAirPlay();
-	self.stateMachine.pushState();
+	this.stateMachine.pushState();
 	//this.stateMachine.unSetVolatile();
 	return 'status change to closeAirPlay';
 };
