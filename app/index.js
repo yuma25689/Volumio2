@@ -68,7 +68,10 @@ function CoreCommandRouter(server) {
     this.pushConsoleMessage('BOOT COMPLETED');
 
 	// 2016/11/28 matuoka add start
-	this.airplayAlbumDeployPath = '';
+	this.receiveAlbumImagePath = '';
+	//this.airplayAlbumDeployPath = '';
+	this.receiveAirplayArtist = '';
+	this.receiveAirplayAlbum = '';
     this.PREFIX_OF_ALBUM = 'coreasal';
     this.PREFIX_OF_ARTIST = 'coreasar';
     this.PREFIX_OF_TRACK_NAME = 'coreminm';
@@ -95,6 +98,50 @@ function CoreCommandRouter(server) {
 }
 
 // 2016/11/28 matuoka add start
+CoreCommandRouter.prototype.updateAlbumArt = function () {
+	if( 0 < self.receiveAlbumImagePath.length
+		&& 0 < self.receiveAirplayArtist.length
+		&& 0 < self.receiveAirplayAlbum.length
+	{
+		// completed artist, album, albumimagepath
+    	var coverFolder = '';
+        var splitted = receiveAlbumImagePath.split('/');
+
+        for(var k = 0; k < splitted.length - 1; k++) {
+        	coverFolder = coverFolder + '/' + splitted[k];
+        }
+        // add artist/album with get path
+        coverFolder += '/' + self.receiveAirplayArtist + '/' + self.receiveAlbumImagePath;
+        fs.ensureDirSync(coverFolder);
+
+        // copy file to the new path
+        var distPath = coverFolder + '/' + splitted[splitted.length-1];
+        self.logger.info('[AirPlay]trying to copyfile('+receiveAlbumImagePath + '=>' + distPath+')');
+        fs.copySync(receiveAlbumImagePath, distPath);
+
+//      	var deployRootFolder = '/mnt';
+		if( coverFolder.indexOf('/mnt') === 0 )
+		{
+			coverFolder = coverFolder.replace('/mnt','');
+		}
+		self.logger.info('[AirPlay]trying to open file('+coverFolder+')');
+
+		var path = ''
+		if( 0 < coverFolder.length )
+		{
+    		path = '?path=' + nodetools.urlEncode(coverFolder);
+    	}
+		var albumartUri = '/albumart' + path;
+		self.logger.info('[AirPlay]albumart uri='+albumartUri);
+
+		self.stateMachine.setAirPlayAlbumArt(albumartUri);
+        if( self.stateMachine.probablyAirPlay() )
+        {
+	    	// it may called too many time
+    		self.stateMachine.pushState();
+    	}
+	}
+}
 CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	var self = this;
     var socket = dgram.createSocket('udp4');
@@ -112,57 +159,17 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 		var dataIDStr = dataID.toString('ascii');
 		self.logger.info('AirPlay_DataID='+dataIDStr);
 
-        if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
-        {
-        	self.logger.info('[AirPlay]try to get album art');
-        	// probably PICTURE...
-			var data = msg.slice(8);
-        	// TODO: judge PNG or JPEG
-			var ext = '.png';
-			if( data.slice(6,10).toString('ascii') === 'JFIF' )
-			{
-				// TODO: 0xFFF8FFFB など
-				ext = '.jpg';
-	        }
-			else if( data.slice(2,4).toString('ascii') === 'PNG' )
-			{
-				ext = '.png';
-	        }
-	        else
-	        {
-	        	self.logger.info('AirPlay-GETIMAGE cant judge image format!');
-	        }
-        	// TODO: save picture as album art
-        	var deployRootFolder = '/mnt';
-        	self.airplayAlbumDeployPath = '/INTERNAL/airplay';
+   //      if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
+   //      {
+			// var decodeMsg = decodeData.toString('utf8');
+			// self.logger.info(decodeMsg);
 
-			var folder = deployRootFolder + self.airplayAlbumDeployPath;
-			var fileName = 'cover' + ext;
-			var filePathForWrite = folder+'/'+fileName;
-
-			fs.ensureDirSync(folder);
-			// overwrite if exists
-			self.logger.info('[AirPlay]trying to write file('+filePathForWrite+')');
-			fs.writeFile(filePathForWrite, data, function (err) {
-				// async process finish
-				if( err ) {
-					self.logger.info('error occured when album art write');
-					return;
-				}
-	        	var path = '?path=' + nodetools.urlEncode(self.airplayAlbumDeployPath);
-				var albumartUri = '/albumart' + path;
-				self.logger.info('[AirPlay]albumart uri='+albumartUri);
-
-				self.stateMachine.setAirPlayAlbumArt(albumartUri);
-		        if( self.stateMachine.probablyAirPlay() )
-		        {
-	    	    	// it may called too many time
-	        		self.stateMachine.pushState();
-	        	}
-			});
-
-        }
-        else
+   //      	var name = decodeMsg.replace( self.PREFIX_OF_PICT, '' );
+   //      	self.receiveAlbumImagePath = name;
+   //      	self.logger.info('[AirPlay]try to get album art path=' + name);
+   //      	self.updateAlbumArt();
+   //      }
+   //      else
         {
 			// convert msg to utf-8 string
 			var decodeMsg = decodeData.toString('utf8');
@@ -177,17 +184,29 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        {
 	        	// regard this data as airplay end
 	        	self.stateMachine.unSetAirPlay();
+		        self.stateMachine.pushState();
 	        }
 	        // --- set variable lastAirPlay series for display UI. ---
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
 	        {
 	        	var name = decodeMsg.replace( self.PREFIX_OF_ALBUM, '' );
 	        	self.stateMachine.setAirPlayAlbum(name);
+				self.receiveAirplayAlbum = name;
+	        	self.updateAlbumArt();
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ARTIST ) )
 	        {
 	        	var name = decodeMsg.replace( self.PREFIX_OF_ARTIST, '' );
 	        	self.stateMachine.setAirPlayArtist(name);
+				self.receiveAirplayArtist = name;
+	        	self.updateAlbumArt();
+	        }
+	        else if( 0 === dataIDStr.indexOf( self.PREFIX_OF_PICT) )
+	        {
+	        	var name = decodeMsg.replace( self.PREFIX_OF_PICT, '' );
+	        	self.receiveAlbumImagePath = name;
+	        	self.logger.info('[AirPlay]get album art image file path=' + name);
+	        	self.updateAlbumArt();
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_TRACK_NAME ) )
 	        {
@@ -199,11 +218,16 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE, '' );
 	        	self.stateMachine.setAirPlayGenre(name);
 	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_START) )
+	        {
+	        	self.airplayAlbumDeployPath = '';
+				self.receiveAirplayArtist = '';
+				self.receiveAirplayAlbum = '';
+	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_END ) )
 	        {
 		        if( self.stateMachine.probablyAirPlay() )
 		        {
-		        	// it may called too many time
 		        	self.stateMachine.pushState();
 		        }
 	        }
