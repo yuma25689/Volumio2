@@ -141,7 +141,7 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
     		self.stateMachine.pushState();
     	}
 	}
-}
+};
 CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	var self = this;
     var socket = dgram.createSocket('udp4');
