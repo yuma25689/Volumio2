@@ -179,12 +179,14 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        {
 	        	// regard this data as airplay start
 	        	self.stateMachine.setAirPlay();
+	        	self.logger.info(self.PREFIX_OF_STREAM_START + ':set airplay');
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_END) )
 	        {
 	        	// regard this data as airplay end
 	        	self.stateMachine.unSetAirPlay();
 		        self.stateMachine.pushState();
+		        self.logger.info(self.PREFIX_OF_STREAM_END + ':unset airplay');
 	        }
 	        // --- set variable lastAirPlay series for display UI. ---
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_ALBUM ) )
@@ -1622,6 +1624,7 @@ CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
 CoreCommandRouter.prototype.volumioCloseAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioCloseAirPlaySession');
 	this.stateMachine.unSetAirPlay();
+	self.stateMachine.pushState();
 	//this.stateMachine.unSetVolatile();
 	return 'status change to closeAirPlay';
 };
