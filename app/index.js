@@ -111,7 +111,7 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
         	coverFolder = coverFolder + '/' + splitted[k];
         }
         // add artist/album with get path
-        coverFolder += '/' + this.receiveAirplayArtist + '/' + this.receiveAlbumImagePath;
+        coverFolder += '/' + this.receiveAirplayArtist + '/' + this.receiveAirplayAlbum;
         fs.ensureDirSync(coverFolder);
 
         // copy file to the new path
