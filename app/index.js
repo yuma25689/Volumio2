@@ -99,32 +99,32 @@ function CoreCommandRouter(server) {
 
 // 2016/11/28 matuoka add start
 CoreCommandRouter.prototype.updateAlbumArt = function () {
-	if( 0 < self.receiveAlbumImagePath.length
-		&& 0 < self.receiveAirplayArtist.length
-		&& 0 < self.receiveAirplayAlbum.length )
+	if( 0 < this.receiveAlbumImagePath.length
+		&& 0 < this.receiveAirplayArtist.length
+		&& 0 < this.receiveAirplayAlbum.length )
 	{
 		// completed artist, album, albumimagepath
     	var coverFolder = '';
-        var splitted = self.receiveAlbumImagePath.split('/');
+        var splitted = this.receiveAlbumImagePath.split('/');
 
         for(var k = 0; k < splitted.length - 1; k++) {
         	coverFolder = coverFolder + '/' + splitted[k];
         }
         // add artist/album with get path
-        coverFolder += '/' + self.receiveAirplayArtist + '/' + self.receiveAlbumImagePath;
+        coverFolder += '/' + this.receiveAirplayArtist + '/' + this.receiveAlbumImagePath;
         fs.ensureDirSync(coverFolder);
 
         // copy file to the new path
         var distPath = coverFolder + '/' + splitted[splitted.length-1];
-        self.logger.info('[AirPlay]trying to copyfile('+self.receiveAlbumImagePath + '=>' + distPath+')');
-        fs.copySync(self.receiveAlbumImagePath, distPath);
+        this.logger.info('[AirPlay]trying to copyfile('+this.receiveAlbumImagePath + '=>' + distPath+')');
+        fs.copySync(this.receiveAlbumImagePath, distPath);
 
 //      	var deployRootFolder = '/mnt';
 		if( coverFolder.indexOf('/mnt') === 0 )
 		{
 			coverFolder = coverFolder.replace('/mnt','');
 		}
-		self.logger.info('[AirPlay]trying to open file('+coverFolder+')');
+		this.logger.info('[AirPlay]trying to open file('+coverFolder+')');
 
 		var path = ''
 		if( 0 < coverFolder.length )
@@ -132,13 +132,13 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
     		path = '?path=' + nodetools.urlEncode(coverFolder);
     	}
 		var albumartUri = '/albumart' + path;
-		self.logger.info('[AirPlay]albumart uri='+albumartUri);
+		this.logger.info('[AirPlay]albumart uri='+albumartUri);
 
-		self.stateMachine.setAirPlayAlbumArt(albumartUri);
-        if( self.stateMachine.probablyAirPlay() )
+		this.stateMachine.setAirPlayAlbumArt(albumartUri);
+        if( this.stateMachine.probablyAirPlay() )
         {
 	    	// it may called too many time
-    		self.stateMachine.pushState();
+    		this.stateMachine.pushState();
     	}
 	}
 };
