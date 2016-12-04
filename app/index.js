@@ -105,7 +105,7 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
 	{
 		// completed artist, album, albumimagepath
     	var coverFolder = '';
-        var splitted = receiveAlbumImagePath.split('/');
+        var splitted = self.receiveAlbumImagePath.split('/');
 
         for(var k = 0; k < splitted.length - 1; k++) {
         	coverFolder = coverFolder + '/' + splitted[k];
@@ -116,8 +116,8 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
 
         // copy file to the new path
         var distPath = coverFolder + '/' + splitted[splitted.length-1];
-        self.logger.info('[AirPlay]trying to copyfile('+receiveAlbumImagePath + '=>' + distPath+')');
-        fs.copySync(receiveAlbumImagePath, distPath);
+        self.logger.info('[AirPlay]trying to copyfile('+self.receiveAlbumImagePath + '=>' + distPath+')');
+        fs.copySync(self.receiveAlbumImagePath, distPath);
 
 //      	var deployRootFolder = '/mnt';
 		if( coverFolder.indexOf('/mnt') === 0 )
