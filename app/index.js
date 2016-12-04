@@ -101,7 +101,7 @@ function CoreCommandRouter(server) {
 CoreCommandRouter.prototype.updateAlbumArt = function () {
 	if( 0 < self.receiveAlbumImagePath.length
 		&& 0 < self.receiveAirplayArtist.length
-		&& 0 < self.receiveAirplayAlbum.length
+		&& 0 < self.receiveAirplayAlbum.length )
 	{
 		// completed artist, album, albumimagepath
     	var coverFolder = '';
@@ -142,6 +142,7 @@ CoreCommandRouter.prototype.updateAlbumArt = function () {
     	}
 	}
 };
+
 CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	var self = this;
     var socket = dgram.createSocket('udp4');
