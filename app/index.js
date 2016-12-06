@@ -241,9 +241,9 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        		var start = parseInt( splitted[0] );
 		        	var duration = end - start;
 		        	var sampleRateHZ = 44100;	// NOTICE: 44100 only?
-		        	duration /= parseInt( duration / sampleRateHZ );
+		        	duration = parseInt( duration / sampleRateHZ );
 		        	var current = current - start;
-		        	current /= parseInt( current / sampleRateHZ );
+		        	current = parseInt( current / sampleRateHZ );
 					self.logger.info('[AirPlay]get progress start=' + start + ' current=' + current + ' end=' + end
 						 + ' duration=' + duration + ' current=' + current);
 
