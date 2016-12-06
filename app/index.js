@@ -180,6 +180,8 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        {
 	        	// regard this data as airplay start
 	        	self.stateMachine.setAirPlay();
+	        	self.stateMachine.setAirPlaySeek(0);
+	        	self.stateMachine.setAirPlayDuration(0);
 		        self.stateMachine.pushState();
 	        	self.logger.info(self.PREFIX_OF_STREAM_START + ':set airplay');
 	        }
