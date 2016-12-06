@@ -27,6 +27,8 @@ function CoreStateMachine(commandRouter) {
 	this.lastAirPlayTrackType = 'mp3';
 	this.lastAirPlayBitDepth = 'たぶん24bit';
 	this.lastAirPlaySampleRate = '44.1KHzかも';
+	this.lastAirPlaySeek = 0;
+	this.lastAirPlayDuration = 0;
 	// 2016/11/28 matuoka add end
 
 	this.logger=this.commandRouter.logger;
@@ -84,8 +86,8 @@ CoreStateMachine.prototype.getState = function () {
         		uri: 'testUri',
         		trackType: this.lastAirPlayTrackType, //'airplaytracktype',//mp3
         		position: 0,
-        		seek: 0,
-        		duration: 0,
+        		seek: this.lastAirPlaySeek,
+        		duration: this.lastAirPlayDuration,
         		samplerate: this.lastAirPlaySampleRate,
         		bitdepth: this.lastAirPlayBitDepth,
         		channels: 2,
@@ -1234,6 +1236,15 @@ CoreStateMachine.prototype.setAirPlayGenre = function (name) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayGenre:'+name);
     this.lastAirPlayGenre=name;
 }
+CoreStateMachine.prototype.setAirPlaySeek = function (val) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlaySeek:'+val);
+    this.lastAirPlaySeek=val;
+}
+CoreStateMachine.prototype.setAirPlayDuration = function (val) {
+    this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayDuration:'+val);
+    this.lastAirPlayDuration=val;
+}
+
 CoreStateMachine.prototype.setAirPlayTrackType = function (name) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayTrackType:'+name);
     this.lastAirPlayTrackType=name;

@@ -180,11 +180,17 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        {
 	        	// regard this data as airplay start
 	        	self.stateMachine.setAirPlay();
+		        self.stateMachine.pushState();
+	        	self.stateMachine.startPlaybackTimer();
 	        	self.logger.info(self.PREFIX_OF_STREAM_START + ':set airplay');
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_END) )
 	        {
 	        	// regard this data as airplay end
+	        	if( self.stateMachine.probablyAirPlay() )
+	        	{
+	        		self.stateMachine.stopPlaybackTimer();
+	        	}
 	        	self.stateMachine.unSetAirPlay();
 		        self.stateMachine.pushState();
 		        self.logger.info(self.PREFIX_OF_STREAM_END + ':unset airplay');
@@ -220,6 +226,32 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        {
 	        	var name = decodeMsg.replace( self.PREFIX_OF_GENRE, '' );
 	        	self.stateMachine.setAirPlayGenre(name);
+	        }
+	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_PROGRESS ) )
+	        {
+	        	var prgrData = decodeMsg.replace( self.PREFIX_OF_PROGRESS, '' );
+	        	var splitted=prgrData.split('/');
+	        	// [0]=start RTP timestamp
+	        	// [1]=current RTP timestamp
+	        	// [2]=end RTP timestamp
+	        	if( 2 <= splitted.length )
+	        	{
+	        		var end = parseInt( splitted[2] );
+	        		var current = parseInt( splitted[1] );
+	        		var start = parseInt( splitted[0] );
+		        	var duration = end - start;
+		        	var sampleRateHZ = 44100;	// NOTICE: 44100 only?
+		        	duration /= parseInt( duration / sampleRateHZ );
+		        	var current = current - start;
+		        	current /= parseInt( current / sampleRateHZ );
+					self.logger.info('[AirPlay]get progress start=' + start + ' current=' + current + ' end=' + end
+						 + ' duration=' + duration + ' current=' + current);
+
+					// I believe below items unit is the second.
+		        	self.stateMachine.setAirPlaySeek(current);
+		        	self.stateMachine.setAirPlayDuration(duration);
+	        	}
+
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_START) )
 	        {
@@ -1624,6 +1656,10 @@ CoreCommandRouter.prototype.volumioStartAirPlaySession = function () {
 // Volumio UnSet Volatile
 CoreCommandRouter.prototype.volumioCloseAirPlaySession = function () {
 	this.pushConsoleMessage('CoreCommandRouter::volumioCloseAirPlaySession');
+	if( this.stateMachine.probablyAirPlay() )
+	{
+		this.stateMachine.stopPlaybackTimer();
+	}
 	this.stateMachine.unSetAirPlay();
 	this.stateMachine.pushState();
 	//this.stateMachine.unSetVolatile();
