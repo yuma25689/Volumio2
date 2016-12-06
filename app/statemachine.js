@@ -305,7 +305,7 @@ CoreStateMachine.prototype.startPlaybackTimer = function (nStartTime) {
 
 	var trackBlock = this.getTrack(this.currentPosition);
 	// 2016/12/06 matuoka add start
-	if(isAirPlay){
+	if(this.isAirPlay){
 		trackBlock = this.getState();
 	}
 	// 2016/12/06 matuoka add end
@@ -340,7 +340,7 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 	this.currentSeek+=(now-this.playbackStart);
 
 	// 2016/12/06 matuoka add start
-	if(isAirPlay){
+	if(this.isAirPlay){
 		return;
 	}
 	// 2016/12/06 matuoka add end
