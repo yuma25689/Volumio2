@@ -341,6 +341,8 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 
 	// 2016/12/06 matuoka add start
 	if(this.isAirPlay){
+		this.lastAirPlaySeek+=(now-this.playbackStart);
+		this.pushState.bind(this);
 		setTimeout(this.increasePlaybackTimer.bind(this),250);
 		return;
 	}
