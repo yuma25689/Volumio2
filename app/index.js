@@ -181,7 +181,6 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        	// regard this data as airplay start
 	        	self.stateMachine.setAirPlay();
 		        self.stateMachine.pushState();
-	        	self.stateMachine.startPlaybackTimer();
 	        	self.logger.info(self.PREFIX_OF_STREAM_START + ':set airplay');
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_STREAM_END) )
@@ -229,29 +228,33 @@ CoreCommandRouter.prototype.createAirPlayTrackReceiver = function () {
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_PROGRESS ) )
 	        {
-	        	var prgrData = decodeMsg.replace( self.PREFIX_OF_PROGRESS, '' );
-	        	var splitted=prgrData.split('/');
-	        	// [0]=start RTP timestamp
-	        	// [1]=current RTP timestamp
-	        	// [2]=end RTP timestamp
-	        	if( 2 <= splitted.length )
-	        	{
-	        		var end = parseInt( splitted[2] );
-	        		var current = parseInt( splitted[1] );
-	        		var start = parseInt( splitted[0] );
-		        	var duration = end - start;
-		        	var sampleRateHZ = 44100;	// NOTICE: 44100 only?
-		        	duration = parseInt( duration / sampleRateHZ );
-		        	var current = current - start;
-		        	current = parseInt( current / sampleRateHZ );
-					self.logger.info('[AirPlay]get progress start=' + start + ' current=' + current + ' end=' + end
-						 + ' duration=' + duration + ' current=' + current);
+		        if( self.stateMachine.probablyAirPlay() )
+		        {
+		        	var prgrData = decodeMsg.replace( self.PREFIX_OF_PROGRESS, '' );
+		        	var splitted=prgrData.split('/');
+		        	// [0]=start RTP timestamp
+		        	// [1]=current RTP timestamp
+		        	// [2]=end RTP timestamp
+		        	if( 2 <= splitted.length )
+		        	{
+		        		var end = parseInt( splitted[2] );
+		        		var current = parseInt( splitted[1] );
+		        		var start = parseInt( splitted[0] );
+			        	var duration = end - start;
+			        	var sampleRateHZ = 44100;	// NOTICE: 44100 only?
+			        	duration = parseInt( duration / sampleRateHZ );
+			        	var current = current - start;
+			        	current = parseInt( current / sampleRateHZ );
+						self.logger.info('[AirPlay]get progress start=' + start + ' current=' + current + ' end=' + end
+							 + ' duration=' + duration + ' current=' + current);
 
-					// I believe below items unit is the second.
-		        	self.stateMachine.setAirPlaySeek(current);
-		        	self.stateMachine.setAirPlayDuration(duration);
-	        	}
-
+						// I believe below items unit is the second.
+			        	self.stateMachine.setAirPlaySeek(current);
+			        	self.stateMachine.setAirPlayDuration(duration);
+		        		self.stateMachine.pushState();
+			        	self.stateMachine.startPlaybackTimer();
+		        	}
+		        }
 	        }
 	        else if( 0 === decodeMsg.indexOf( self.PREFIX_OF_METADATA_START) )
 	        {
