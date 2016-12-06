@@ -1253,7 +1253,7 @@ CoreStateMachine.prototype.setAirPlayGenre = function (name) {
 }
 CoreStateMachine.prototype.setAirPlaySeek = function (val) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlaySeek:'+val);
-    this.lastAirPlaySeek=val;
+    this.lastAirPlaySeek=val*1000;
 }
 CoreStateMachine.prototype.setAirPlayDuration = function (val) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayDuration:'+val);
