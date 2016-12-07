@@ -337,17 +337,16 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 	var self=this;
 
 	var now=Date.now();
-	this.currentSeek+=(now-this.playbackStart);
-
 	// 2016/12/06 matuoka add start
-	if(this.isAirPlay){
+	if(this.isAirPlay && this.runPlaybackTimer==true){
 		this.lastAirPlaySeek+=(now-this.playbackStart);
-		this.pushState.bind(this);
+		this.pushState().fail(this.pushError.bind(this));
 		setTimeout(this.increasePlaybackTimer.bind(this),250);
 		return;
 	}
 	// 2016/12/06 matuoka add end
 
+	this.currentSeek+=(now-this.playbackStart);
 
 	if(this.runPlaybackTimer==true)
 	{
@@ -1253,7 +1252,7 @@ CoreStateMachine.prototype.setAirPlayGenre = function (name) {
 }
 CoreStateMachine.prototype.setAirPlaySeek = function (val) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlaySeek:'+val);
-    this.lastAirPlaySeek=val*1000;
+    this.lastAirPlaySeek=Math.round(val*1000);
 }
 CoreStateMachine.prototype.setAirPlayDuration = function (val) {
     this.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'CoreStateMachine::setAirPlayDuration:'+val);
