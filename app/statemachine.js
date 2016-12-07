@@ -307,6 +307,7 @@ CoreStateMachine.prototype.startPlaybackTimer = function (nStartTime) {
 	// 2016/12/06 matuoka add start
 	if(this.isAirPlay){
 		trackBlock = this.getState();
+		this.commandRouter.pushConsoleMessage('seek=' + this.lastAirPlaySeek );
 	}
 	// 2016/12/06 matuoka add end
 
@@ -340,6 +341,8 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 	// 2016/12/06 matuoka add start
 	if(this.isAirPlay && this.runPlaybackTimer==true){
 		this.lastAirPlaySeek+=(now-this.playbackStart);
+		this.commandRouter.pushConsoleMessage('increasePlayBack Timer seek=' + this.lastAirPlaySeek );
+		this.commandRouter.pushConsoleMessage('playbackStart=' + this.playbackStart + ' now=' + now );
 		this.pushState().fail(this.pushError.bind(this));
 		setTimeout(this.increasePlaybackTimer.bind(this),250);
 		return;
