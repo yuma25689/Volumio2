@@ -346,8 +346,13 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 	var now=Date.now();
 	// 2016/12/06 matuoka add start
 	if(this.isAirPlay && this.runPlaybackTimer==true){
-		this.lastAirPlaySeek+=(now-this.playbackStart);
-		this.playbackStart=now;
+		var diff=(now-this.playbackStart);
+		if( 1000 < diff )
+		{
+			this.lastAirPlaySeek+=diff;
+			this.playbackStart=now;
+			this.pushState();
+		}
 		//this.commandRouter.pushConsoleMessage('increasePlayBack Timer seek=' + this.lastAirPlaySeek );
 		//this.commandRouter.pushConsoleMessage('playbackStart=' + this.playbackStart + ' now=' + now );
 		//this.pushState().fail(this.pushError.bind(this));
