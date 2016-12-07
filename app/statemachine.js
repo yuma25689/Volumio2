@@ -303,13 +303,19 @@ CoreStateMachine.prototype.startPlaybackTimer = function (nStartTime) {
 	this.runPlaybackTimer=true;
 	this.playbackStart=Date.now();
 
-	var trackBlock = this.getTrack(this.currentPosition);
 	// 2016/12/06 matuoka add start
 	if(this.isAirPlay){
-		trackBlock = this.getState();
-		this.commandRouter.pushConsoleMessage('seek=' + this.lastAirPlaySeek );
+		this.commandRouter.pushConsoleMessage('seek=' + this.lastAirPlaySeek  + ' duration=' + this.lastAirPlayDuration*1000);
+
+		this.askedForPrefetch=false;
+		this.simulateStopStartDone=false;
+		setTimeout(this.increasePlaybackTimer.bind(this),250);
+
+		return;
 	}
 	// 2016/12/06 matuoka add end
+
+	var trackBlock = this.getTrack(this.currentPosition);
 
 	if(trackBlock){
 		this.currentSongDuration=trackBlock.duration*1000;
