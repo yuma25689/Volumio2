@@ -140,7 +140,7 @@ CoreStateMachine.prototype.getState = function () {
                 albumart: trackBlock.albumart,
                 uri: trackBlock.uri,
                 trackType: trackBlock.trackType,
-                seek: this.currentSeek,
+                seek: this.isAirPlay ? this.lastAirPlaySeek : this.currentSeek,	//this.currentSeek, // 2016/12/08 matuoka upd
                 duration: trackBlock.duration,
                 samplerate: trackBlock.samplerate,
                 bitdepth: trackBlock.bitdepth,
