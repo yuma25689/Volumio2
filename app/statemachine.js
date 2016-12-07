@@ -348,8 +348,8 @@ CoreStateMachine.prototype.increasePlaybackTimer = function () {
 	if(this.isAirPlay && this.runPlaybackTimer==true){
 		this.lastAirPlaySeek+=(now-this.playbackStart);
 		this.playbackStart=now;
-		this.commandRouter.pushConsoleMessage('increasePlayBack Timer seek=' + this.lastAirPlaySeek );
-		this.commandRouter.pushConsoleMessage('playbackStart=' + this.playbackStart + ' now=' + now );
+		//this.commandRouter.pushConsoleMessage('increasePlayBack Timer seek=' + this.lastAirPlaySeek );
+		//this.commandRouter.pushConsoleMessage('playbackStart=' + this.playbackStart + ' now=' + now );
 		this.pushState().fail(this.pushError.bind(this));
 		setTimeout(this.increasePlaybackTimer.bind(this),250);
 		return;
